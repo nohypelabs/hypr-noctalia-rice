@@ -5,6 +5,12 @@ Bisa dipasang ke laptop atau PC lain berbasis Arch dengan satu skrip.
 
 Kalau kepakai, kasih ⭐ ya. Issue dan PR juga dipersilakan.
 
+![Desktop dengan strip workspace ter-pin](screenshots/desktop-pinned.png)
+
+| Strip workspace (mode hover, kartu 3D) | Launcher ala Spotlight | Cheatsheet keybind (Super+/) |
+|---|---|---|
+| ![Strip workspace mode hover](screenshots/strip-hover.png) | ![Launcher](screenshots/launcher.png) | ![Cheatsheet](screenshots/cheatsheet.png) |
+
 - [Isi rice](#isi-rice)
 - [Tutorial pasang dari nol](#tutorial-pasang-dari-nol)
   - [0. Syarat](#0-syarat)
@@ -43,6 +49,7 @@ hypr-noctalia-rice/
 ├── install.sh      # pasang paket + config ke $HOME
 ├── sync.sh         # tarik config dari mesin utama ke repo
 ├── packages.txt    # daftar paket
+├── screenshots/    # gambar README
 └── home/           # cermin isi $HOME (path home ditulis @HOME@)
     ├── .config/{hypr,noctalia,kitty,qt6ct,uwsm}
     ├── .local/{bin,lib,share/noctalia-plugins,state/noctalia}
