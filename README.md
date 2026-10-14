@@ -244,7 +244,7 @@ Hot corner: kanan atas = control center, kiri bawah = Spotlight, kanan bawah = k
 ## Update di mesin yang sudah terpasang
 
 ```bash
-cd ~/hypr-noctalia-rice
+cd hypr-noctalia-rice     # folder hasil clone
 git pull
 ./install.sh --no-packages        # tambah paket baru? jalankan tanpa --no-packages
 ```
@@ -290,7 +290,7 @@ File yang sebelumnya **belum ada** gak ikut dibackup. Hapus manual kalau perlu: 
 Habis ngoprek rice di mesin utama:
 
 ```bash
-cd ~/hypr-noctalia-rice
+cd hypr-noctalia-rice     # folder hasil clone
 ./sync.sh        # tarik config yang sedang dipakai ke home/ (path → @HOME@)
 git diff         # cek perubahan
 git add -A && git commit -m "…" && git push
