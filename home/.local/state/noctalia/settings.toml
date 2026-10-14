@@ -428,7 +428,10 @@ panel_anchor_bar = "default"
     show_app_origin_indicator = false
 
     [shell.panel]
-    clipboard_placement = "attached"
+    clipboard_placement = "floating"
+    clipboard_position = "center"
+    wallpaper_placement = "floating"
+    wallpaper_position = "center"
     control_center_placement = "floating"
     control_center_position = "top_right"
     open_near_click_control_center = false
