@@ -40,10 +40,10 @@ Kalau kepakai, kasih ⭐ ya. Issue dan PR juga dipersilakan.
 | Bagian | Keterangan |
 |---|---|
 | **Hyprland** (`~/.config/hypr`, config Lua) | Dekorasi squircle + blur, animasi pegas ala iOS, perpindahan workspace vertikal, swipe 4 jari atas/bawah, mode layar proyektor |
-| **noctalia** (`~/.local/state/noctalia/settings.toml`) | Bar "Dynamic Island", dock ngambang + magnifikasi, lock screen ala iOS, hot corner, Night Light, plugin `uptime` & `spotlight` (tombol kaca pembesar di bar) |
+| **noctalia** (`~/.local/state/noctalia/settings.toml`) | Bar tipis 30px: kiri 🔍 + titik workspace + **nama aplikasi aktif** ala menu bar macOS, tengah "Dynamic Island" hitam (jam + media), kanan ikon status ringkas; kapsul samping transparan-blur. OSD volume/brightness di kanan atas (ala macOS Tahoe), dock ngambang + magnifikasi, lock screen ala iOS, hot corner, Night Light. Plugin lokal: `spotlight`, `appname`, `uptime` |
 | **spotlight** | Launcher ala Spotlight macOS: awalnya cuma bar pencarian, hasil Top Hit / Aplikasi muncul saat mengetik, kalkulator inline (Enter = salin), cari di web. Aplikasi yang sering dibuka naik ke atas |
 | **Launchpad** (bagian dari daemon spotlight) | Grid ikon semua aplikasi layar penuh ala macOS: 7×5 per halaman, latar desktop diblur, pencarian, geser halaman pakai touchpad/scroll/←→. Dibuka lewat ikon di dock, Super+G, atau cubit 4 jari |
-| **wsstrip** | Strip workspace di kiri (kartu 3D gaya Stage Manager). Muncul saat kursor di tepi kiri, bisa di-pin jadi kolom tetap (5 workspace, yang kosong disembunyikan) |
+| **wsstrip** | (juga menulis nama aplikasi aktif buat plugin bar `appname`) Strip workspace di kiri (kartu 3D gaya Stage Manager). Muncul saat kursor di tepi kiri, bisa di-pin jadi kolom tetap (5 workspace, yang kosong disembunyikan) |
 | **keyhud** | HUD kecil tiap kali keybind ditekan + cheatsheet (Super+/) |
 | **noctalia-keepalive** | Menyalakan ulang noctalia kalau mati (mis. setelah suspend) |
 | **kitty** | Tema Tokyo Night, terminal dropdown (Super+\`), kitten scroll/search |

@@ -11,7 +11,7 @@ capsule_padding = 10.0
 capsule_radius = 15
 capsule_thickness = 0.85999999999999999
 center = [ "group:island" ]
-compositor_blur = false
+compositor_blur = true
 concave_edge_corners = false
 contact_shadow = false
 end = [ "group:stats", "group:status" ]
@@ -25,15 +25,15 @@ radius_top_left = 0
 radius_top_right = 0
 shadow = false
 start = [ "group:left" ]
-thickness = 36
+thickness = 30
 widget_spacing = 8
 
     [[bar.default.capsule_group]]
     border = ""
     fill = "#000000"
     id = "left"
-    members = [ "dracarys/spotlight:bar", "workspaces" ]
-    opacity = 0.92000000000000004
+    members = [ "dracarys/spotlight:bar", "workspaces", "dracarys/appname:bar" ]
+    opacity = 0.55
     padding = 12.0
 
     [[bar.default.capsule_group]]
@@ -50,28 +50,16 @@ widget_spacing = 8
     border = ""
     fill = "#000000"
     id = "stats"
-    members = [ "temp", "sysmon_2", "sysmon_3" ]
-    opacity = 0.92000000000000004
+    members = [ "temp", "sysmon_2", "sysmon_3", "dracarys/uptime:bar" ]
+    opacity = 0.55
     padding = 10.0
 
     [[bar.default.capsule_group]]
     border = ""
     fill = "#000000"
     id = "status"
-    members = [
-        "tray",
-        "notifications",
-        "clipboard",
-        "network",
-        "bluetooth",
-        "volume",
-        "brightness",
-        "dracarys/uptime:bar",
-        "battery",
-        "control-center",
-        "session"
-    ]
-    opacity = 0.92000000000000004
+    members = [ "tray", "network", "bluetooth", "volume", "battery", "control-center" ]
+    opacity = 0.55
     padding = 12.0
 
 [dock]
@@ -398,7 +386,7 @@ temperature_day = 6500
 temperature_night = 3800
 
 [plugins]
-enabled = [ "dracarys/spotlight", "dracarys/uptime" ]
+enabled = [ "dracarys/appname", "dracarys/spotlight", "dracarys/uptime" ]
 
     [[plugins.source]]
     enabled = true
@@ -512,3 +500,9 @@ color = "on_surface"
 
 [widget.workspaces]
 capsule = false
+
+[osd]
+border = false
+offset_x = 14
+offset_y = 6
+position = "top_right"

@@ -155,12 +155,14 @@ def gdk_monitor(display, name):
 
 
 _icon_cache = {}
+_info_cache = {}
+ACTIVE_APP_FILE = os.path.join(RUNTIME, "rice-active-app")
 
 
-def app_icon(cls):
-    """Ikon dari class window -> .desktop (Gio), fallback ikon generik."""
-    if cls in _icon_cache:
-        return _icon_cache[cls]
+def app_info(cls):
+    """class window -> DesktopAppInfo (atau None)."""
+    if cls in _info_cache:
+        return _info_cache[cls]
     info = None
     for cand in (cls, cls.lower()):
         try:
@@ -177,9 +179,30 @@ def app_icon(cls):
                     break
             if info:
                 break
-    icon = info.get_icon() if info else None
-    _icon_cache[cls] = icon or Gio.ThemedIcon.new("application-x-executable")
+    _info_cache[cls] = info
+    return info
+
+
+def app_icon(cls):
+    """Ikon dari class window -> .desktop (Gio), fallback ikon generik."""
+    if cls not in _icon_cache:
+        info = app_info(cls)
+        icon = info.get_icon() if info else None
+        _icon_cache[cls] = icon or Gio.ThemedIcon.new("application-x-executable")
     return _icon_cache[cls]
+
+
+def write_active_app(cls):
+    """Nama aplikasi aktif (ala menu bar macOS) buat plugin bar noctalia dracarys/appname."""
+    info = app_info(cls) if cls else None
+    name = (info.get_display_name() if info else cls) or ""
+    try:
+        with open(ACTIVE_APP_FILE + ".tmp", "w") as f:
+            f.write(name)
+        os.replace(ACTIVE_APP_FILE + ".tmp", ACTIVE_APP_FILE)
+    except OSError:
+        pass
+    return False
 
 
 _tex_cache = {}
@@ -688,6 +711,7 @@ class App(Gtk.Application):
         self.sock.bind(SOCK)
         GLib.io_add_watch(self.sock.fileno(), GLib.PRIORITY_DEFAULT, GLib.IO_IN, self._on_msg)
         threading.Thread(target=self._events, daemon=True).start()
+        write_active_app((hypr("activewindow") or {}).get("class", ""))
         self._schedule_capture(SETTLE_MS)
 
     def _on_msg(self, fd, cond):
@@ -730,7 +754,11 @@ class App(Gtk.Application):
             s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
             s.connect(path)
             for line in s.makefile("r", errors="ignore"):
-                ev = line.split(">>", 1)[0]
+                ev, _, data = line.rstrip("\n").partition(">>")
+                if ev == "activewindow":   # data = "class,title"
+                    GLib.idle_add(write_active_app, data.split(",", 1)[0])
+                elif ev == "openlayer" and data.startswith("noctalia-bar"):
+                    GLib.idle_add(self._on_bar_created)
                 if ev in ("workspacev2", "openwindow", "closewindow", "movewindowv2",
                           "focusedmonv2"):
                     GLib.idle_add(self._on_event)
@@ -738,6 +766,22 @@ class App(Gtk.Application):
             pass
         # socket putus = Hyprland selesai; jangan nyangkut jadi yatim
         GLib.idle_add(self.quit)
+
+    def _on_bar_created(self):
+        # Exclusive zone ditata sesuai urutan surface dibuat. Bar noctalia yang dibuat
+        # ulang (reload config/restart) setelah strip ter-pin jadi ikut menghindari
+        # kolom strip dan bergeser ke kanan. Petakan ulang strip supaya ia jadi yang
+        # terakhir: bar kembali selebar layar, strip di bawahnya.
+        if self.strip.pinned and not getattr(self, "_remap_id", None):
+            self._remap_id = GLib.timeout_add(400, self._remap_strip)
+        return False
+
+    def _remap_strip(self):
+        self._remap_id = None
+        if self.strip.pinned:
+            self.strip.win.set_visible(False)
+            GLib.timeout_add(30, lambda: (self.strip.win.present(), False)[1])
+        return False
 
     def _on_event(self):
         self._schedule_capture(SETTLE_MS)

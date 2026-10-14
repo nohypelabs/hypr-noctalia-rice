@@ -1,0 +1,13 @@
+id = "dracarys/appname"
+name = "App Name"
+version = "1.0.0"
+plugin_api = 24
+author = "dracarys"
+license = "MIT"
+tags = ["bar", "window"]
+icon = "app-window"
+description = "Nama aplikasi yang sedang aktif, ala menu bar macOS (dibaca dari file yang ditulis wsstrip)."
+
+[[widget]]
+id = "bar"
+entry = "bar.luau"
