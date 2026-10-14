@@ -4,7 +4,7 @@
 # --- inti sesi ---
 hyprland            # >= 0.56 (config Lua)
 uwsm
-noctalia            # shell 5.x (CachyOS: cachyos-extra; Arch polos: AUR)
+noctalia            # shell 5.x (CachyOS: cachyos-extra; Arch polos: otomatis AUR noctalia-git)
 xdg-desktop-portal-hyprland
 xdg-desktop-portal-gtk
 libnotify
@@ -20,6 +20,7 @@ socat
 grim
 slurp
 hyprpicker
+nwg-displays        # Super+P / tombol XF86Display: atur monitor
 playerctl
 brightnessctl
 

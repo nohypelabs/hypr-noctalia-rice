@@ -41,8 +41,12 @@ install_packages() {
   info "Memasang paket"
   mapfile -t want < <(sed -e 's/#.*//' -e 's/[[:space:]]//g' "$REPO/packages.txt" | grep -v '^$')
   local repo_pkgs=() aur_pkgs=()
+  # nama di AUR kalau beda dari nama repo (CachyOS punya "noctalia", Arch polos cuma AUR "noctalia-git")
+  declare -A aur_name=([noctalia]=noctalia-git)
   for p in "${want[@]}"; do
-    if pacman -Si "$p" >/dev/null 2>&1; then repo_pkgs+=("$p"); else aur_pkgs+=("$p"); fi
+    if pacman -Si "$p" >/dev/null 2>&1; then repo_pkgs+=("$p")
+    elif pacman -Qq "${aur_name[$p]:-$p}" >/dev/null 2>&1 || pacman -Qq "$p" >/dev/null 2>&1; then :
+    else aur_pkgs+=("${aur_name[$p]:-$p}"); fi
   done
   run sudo pacman -S --needed --noconfirm "${repo_pkgs[@]}"
   if ((${#aur_pkgs[@]})); then
