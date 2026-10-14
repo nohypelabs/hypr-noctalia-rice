@@ -14,7 +14,7 @@ center = [ "group:island" ]
 compositor_blur = true
 concave_edge_corners = false
 contact_shadow = false
-end = [ "group:stats", "group:status" ]
+end = [ "group:nowplaying", "group:stats", "group:status" ]
 hover_highlight = true
 margin_edge = 6
 margin_ends = 10
@@ -40,9 +40,18 @@ widget_spacing = 8
     border = ""
     fill = "#000000"
     id = "island"
-    members = [ "island_clock", "media", "island_viz" ]
+    members = [ "island_clock" ]
     opacity = 1.0
     padding = 16.0
+
+    # Now Playing terpisah dari island: jam tetap persis di tengah layar saat ada media
+    [[bar.default.capsule_group]]
+    border = ""
+    fill = "#000000"
+    id = "nowplaying"
+    members = [ "media", "island_viz" ]
+    opacity = 1.0
+    padding = 14.0
 
     [[bar.default.capsule_group]]
     accordion = true
