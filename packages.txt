@@ -1,0 +1,53 @@
+# Paket yang dipasang install.sh (satu per baris, # = komentar).
+# Dicari dulu di repo pacman; yang gak ada dicoba lewat AUR helper (paru/yay).
+
+# --- inti sesi ---
+hyprland            # >= 0.56 (config Lua)
+uwsm
+noctalia            # shell 5.x (CachyOS: cachyos-extra; Arch polos: AUR)
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+libnotify
+
+# --- wsstrip & keyhud (GTK4 + layer-shell, Python) ---
+gtk4
+gtk4-layer-shell
+python-gobject
+python-cairo
+socat
+
+# --- screenshot, media, layar ---
+grim
+slurp
+hyprpicker
+playerctl
+brightnessctl
+
+# --- tampilan ---
+inter-font
+ttf-jetbrains-mono-nerd
+qt6ct
+adw-gtk-theme
+
+# --- terminal & file manager (Super+E = yazi di kitty) ---
+kitty
+yazi
+ffmpegthumbnailer
+poppler
+fd
+ripgrep
+fzf
+zoxide
+imagemagick
+7zip
+jq
+resvg
+chafa
+btop
+
+# --- aplikasi default di variables.lua (ganti di sana kalau pakai yang lain) ---
+gnome-calculator
+gnome-text-editor
+
+# --- dipakai install.sh ---
+git

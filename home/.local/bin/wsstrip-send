@@ -1,0 +1,5 @@
+#!/bin/sh
+# Kirim perintah ke daemon wsstrip: toggle | show | hide | anim [pintu|geser|flip|zoom|kipas] | pin [on|off]
+sock="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/wsstrip.sock"
+[ -S "$sock" ] || exit 1
+printf '%s' "$*" | timeout 0.5 socat -u - "UNIX-SENDTO:$sock" 2>/dev/null

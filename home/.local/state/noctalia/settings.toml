@@ -1,0 +1,508 @@
+config_version = 14
+
+[accessibility]
+ui_scale = 1.0000000074505806
+
+[bar.default]
+background_opacity = 0.0
+border_width = 0.0
+capsule = false
+capsule_padding = 10.0
+capsule_radius = 15
+capsule_thickness = 0.85999999999999999
+center = [ "group:island" ]
+compositor_blur = false
+concave_edge_corners = false
+contact_shadow = false
+end = [ "group:stats", "group:status" ]
+hover_highlight = true
+margin_edge = 6
+margin_ends = 10
+radius = 0
+radius_bottom_left = 0
+radius_bottom_right = 0
+radius_top_left = 0
+radius_top_right = 0
+shadow = false
+start = [ "group:left" ]
+thickness = 36
+widget_spacing = 8
+
+    [[bar.default.capsule_group]]
+    border = ""
+    fill = "#000000"
+    id = "left"
+    members = [ "launcher", "workspaces" ]
+    opacity = 0.92000000000000004
+    padding = 12.0
+
+    [[bar.default.capsule_group]]
+    border = ""
+    fill = "#000000"
+    id = "island"
+    members = [ "island_clock", "media", "island_viz" ]
+    opacity = 1.0
+    padding = 16.0
+
+    [[bar.default.capsule_group]]
+    accordion = true
+    accordion_direction = "start"
+    border = ""
+    fill = "#000000"
+    id = "stats"
+    members = [ "temp", "sysmon_2", "sysmon_3" ]
+    opacity = 0.92000000000000004
+    padding = 10.0
+
+    [[bar.default.capsule_group]]
+    border = ""
+    fill = "#000000"
+    id = "status"
+    members = [
+        "tray",
+        "notifications",
+        "clipboard",
+        "network",
+        "bluetooth",
+        "volume",
+        "brightness",
+        "dracarys/uptime:bar",
+        "battery",
+        "control-center",
+        "session"
+    ]
+    opacity = 0.92000000000000004
+    padding = 12.0
+
+[dock]
+active_scale = 1.0
+auto_hide = false
+background_opacity = 0.55000000000000004
+border = "#ffffff"
+border_width = 0.0
+concave_edge_corners = false
+cross_axis_padding = 8
+enabled = true
+icon_size = 46
+inactive_opacity = 1.0
+inactive_scale = 1.0
+item_spacing = 8
+launcher_icon = "grid-dots"
+launcher_position = "start"
+magnification = true
+magnification_scale = 1.6000000000000001
+main_axis_padding = 10
+margin_edge = 8
+pinned = [ "brave-browser", "kitty", "org.telegram.desktop", "yazi", "dev.zed.Zed", "code-oss", "obsidian", "spotify" ]
+position = "bottom"
+radius = 22
+reserve_space = false
+shadow = true
+show_dots = true
+show_instance_count = false
+show_running = true
+smart_auto_hide = true
+
+[hot_corners]
+delay_ms = 300
+enabled = true
+
+    [hot_corners.bottom_left]
+    action = "command"
+    command = "noctalia msg panel-toggle launcher"
+
+    [hot_corners.bottom_right]
+    action = "command"
+    command = "noctalia msg session lock"
+
+    [hot_corners.top_right]
+    action = "command"
+    command = "noctalia msg panel-toggle control-center"
+
+[location]
+auto_locate = true
+
+[lockscreen]
+blur_intensity = 0.34999999999999998
+tint_intensity = 0.25
+
+[lockscreen_widgets]
+enabled = true
+schema_version = 2
+widget_order = [
+    "ios-date@FALLBACK",
+    "ios-time@FALLBACK",
+    "ios-media@FALLBACK",
+    "lockscreen-login-box@FALLBACK",
+    "ios-date@HDMI-A-1",
+    "ios-time@HDMI-A-1",
+    "ios-media@HDMI-A-1",
+    "lockscreen-login-box@HDMI-A-1",
+    "ios-date@eDP-1",
+    "ios-time@eDP-1",
+    "ios-media@eDP-1",
+    "lockscreen-login-box@eDP-1"
+]
+
+    [lockscreen_widgets.grid]
+    cell_size = 16
+    major_interval = 4
+    visible = true
+
+    [lockscreen_widgets.widget."ios-date@FALLBACK"]
+    box_height = 48.0
+    box_width = 640.0
+    cx = 960.0
+    cy = 150.0
+    output = "FALLBACK"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "clock"
+
+        [lockscreen_widgets.widget."ios-date@FALLBACK".settings]
+        background_opacity = 0.0
+        color = "#ffffff"
+        font_family = "Inter Display Medium"
+        format = "{:%A, %d %B}"
+        shadow = false
+
+    [lockscreen_widgets.widget."ios-date@HDMI-A-1"]
+    box_height = 48.0
+    box_width = 640.0
+    cx = 1280.0
+    cy = 150.0
+    output = "HDMI-A-1"
+    placement_height = 1080.0
+    placement_width = 2560.0
+    rotation = 0.0
+    type = "clock"
+
+        [lockscreen_widgets.widget."ios-date@HDMI-A-1".settings]
+        background_opacity = 0.0
+        color = "#ffffff"
+        font_family = "Inter Display Medium"
+        format = "{:%A, %d %B}"
+        shadow = false
+
+    [lockscreen_widgets.widget."ios-date@eDP-1"]
+    box_height = 48.0
+    box_width = 640.0
+    cx = 960.0
+    cy = 150.0
+    output = "eDP-1"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "clock"
+
+        [lockscreen_widgets.widget."ios-date@eDP-1".settings]
+        background_opacity = 0.0
+        color = "#ffffff"
+        font_family = "Inter Display Medium"
+        format = "{:%A, %d %B}"
+        shadow = false
+
+    [lockscreen_widgets.widget."ios-media@FALLBACK"]
+    box_height = 96.0
+    box_width = 400.0
+    cx = 960.0
+    cy = 790.0
+    output = "FALLBACK"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "media_player"
+
+        [lockscreen_widgets.widget."ios-media@FALLBACK".settings]
+        background_color = "#000000"
+        background_opacity = 0.29999999999999999
+        background_radius = 26.0
+        color = "#ffffff"
+        layout = "horizontal"
+
+    [lockscreen_widgets.widget."ios-media@HDMI-A-1"]
+    box_height = 96.0
+    box_width = 400.0
+    cx = 1280.0
+    cy = 790.0
+    output = "HDMI-A-1"
+    placement_height = 1080.0
+    placement_width = 2560.0
+    rotation = 0.0
+    type = "media_player"
+
+        [lockscreen_widgets.widget."ios-media@HDMI-A-1".settings]
+        background_color = "#000000"
+        background_opacity = 0.29999999999999999
+        background_radius = 26.0
+        color = "#ffffff"
+        layout = "horizontal"
+
+    [lockscreen_widgets.widget."ios-media@eDP-1"]
+    box_height = 96.0
+    box_width = 400.0
+    cx = 960.0
+    cy = 790.0
+    output = "eDP-1"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "media_player"
+
+        [lockscreen_widgets.widget."ios-media@eDP-1".settings]
+        background_color = "#000000"
+        background_opacity = 0.29999999999999999
+        background_radius = 26.0
+        color = "#ffffff"
+        layout = "horizontal"
+
+    [lockscreen_widgets.widget."ios-time@FALLBACK"]
+    box_height = 220.0
+    box_width = 760.0
+    cx = 960.0
+    cy = 290.0
+    output = "FALLBACK"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "clock"
+
+        [lockscreen_widgets.widget."ios-time@FALLBACK".settings]
+        background_opacity = 0.0
+        color = "#ffffff"
+        font_family = "Inter Display Light"
+        format = "{:%H:%M}"
+        shadow = false
+
+    [lockscreen_widgets.widget."ios-time@HDMI-A-1"]
+    box_height = 220.0
+    box_width = 760.0
+    cx = 1280.0
+    cy = 290.0
+    output = "HDMI-A-1"
+    placement_height = 1080.0
+    placement_width = 2560.0
+    rotation = 0.0
+    type = "clock"
+
+        [lockscreen_widgets.widget."ios-time@HDMI-A-1".settings]
+        background_opacity = 0.0
+        color = "#ffffff"
+        font_family = "Inter Display Light"
+        format = "{:%H:%M}"
+        shadow = false
+
+    [lockscreen_widgets.widget."ios-time@eDP-1"]
+    box_height = 220.0
+    box_width = 760.0
+    cx = 960.0
+    cy = 290.0
+    output = "eDP-1"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "clock"
+
+        [lockscreen_widgets.widget."ios-time@eDP-1".settings]
+        background_opacity = 0.0
+        color = "#ffffff"
+        font_family = "Inter Display Light"
+        format = "{:%H:%M}"
+        shadow = false
+
+    [lockscreen_widgets.widget."lockscreen-login-box@FALLBACK"]
+    box_height = 70.0
+    box_width = 360.0
+    cx = 960.0
+    cy = 970.0
+    output = "FALLBACK"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@FALLBACK".settings]
+        background_color = "#000000"
+        background_opacity = 0.0
+        background_radius = 28.0
+        center_password_text = true
+        input_opacity = 0.90000000000000002
+        input_radius = 20.0
+        layout = "compact"
+        show_caps_lock = true
+        show_keyboard_layout = false
+        show_login_button = false
+        show_media = false
+        show_session_buttons = false
+        show_unlock_hint = false
+        show_weather = false
+
+    [lockscreen_widgets.widget."lockscreen-login-box@HDMI-A-1"]
+    box_height = 70.0
+    box_width = 360.0
+    cx = 1280.0
+    cy = 970.0
+    output = "HDMI-A-1"
+    placement_height = 1080.0
+    placement_width = 2560.0
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@HDMI-A-1".settings]
+        background_color = "#000000"
+        background_opacity = 0.0
+        background_radius = 28.0
+        center_password_text = true
+        input_opacity = 0.90000000000000002
+        input_radius = 20.0
+        layout = "compact"
+        show_caps_lock = true
+        show_keyboard_layout = false
+        show_login_button = false
+        show_media = false
+        show_session_buttons = false
+        show_unlock_hint = false
+        show_weather = false
+
+    [lockscreen_widgets.widget."lockscreen-login-box@eDP-1"]
+    box_height = 70.0
+    box_width = 360.0
+    cx = 960.0
+    cy = 970.0
+    output = "eDP-1"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@eDP-1".settings]
+        background_color = "#000000"
+        background_opacity = 0.0
+        background_radius = 28.0
+        center_password_text = true
+        input_opacity = 0.90000000000000002
+        input_radius = 20.0
+        layout = "compact"
+        show_caps_lock = true
+        show_keyboard_layout = false
+        show_login_button = false
+        show_media = false
+        show_session_buttons = false
+        show_unlock_hint = false
+        show_weather = false
+
+[nightlight]
+enabled = true
+temperature_day = 6500
+temperature_night = 3800
+
+[plugins]
+enabled = [ "dracarys/uptime" ]
+
+    [[plugins.source]]
+    enabled = true
+    kind = "git"
+    location = "https://github.com/noctalia-dev/official-plugins"
+    name = "official"
+
+    [[plugins.source]]
+    enabled = true
+    kind = "git"
+    location = "https://github.com/noctalia-dev/community-plugins"
+    name = "community"
+
+    [[plugins.source]]
+    enabled = true
+    kind = "path"
+    location = "@HOME@/.local/share/noctalia-plugins"
+    name = "local"
+
+[shell]
+font_family = "Inter"
+panel_anchor_bar = "default"
+
+    [shell.launcher]
+    categories = false
+    compact = true
+    show_app_origin_indicator = false
+
+    [shell.panel]
+    clipboard_placement = "attached"
+    floating_offset = 170
+    launcher_position = "top_center"
+    polkit_position = "auto"
+    transparency_mode = "glass"
+
+    [shell.screenshot]
+    copy_to_clipboard = true
+    directory = "@HOME@/Pictures/Screenshots"
+    freeze_screen = true
+    save_to_file = true
+    skip_annotate_on_copy_save = true
+
+    [shell.shadow]
+    direction = "center"
+
+[theme]
+builtin = "Eldritch"
+mode = "dark"
+source = "wallpaper"
+wallpaper_scheme = "m3-content"
+
+    [theme.templates]
+    builtin_ids = [ "alacritty" ]
+
+[wallpaper]
+directory = "@HOME@/Pictures/Wallpapers"
+
+    [wallpaper.default]
+    path = "@HOME@/Pictures/Wallpapers/macos-mesh-aurora.png"
+
+    [wallpaper.last]
+    path = "@HOME@/Pictures/Wallpapers/macos-mesh-aurora.png"
+
+    [wallpaper.monitors.HDMI-A-1]
+    path = "@HOME@/Pictures/Wallpapers/macos-mesh-aurora.png"
+
+    [wallpaper.monitors.eDP-1]
+    path = "@HOME@/Pictures/Wallpapers/macos-mesh-aurora.png"
+
+[widget.island_clock]
+color = "on_surface"
+format = "{:%a %d %b  %H:%M}"
+type = "clock"
+
+[widget.island_viz]
+bands = 12
+show_when_idle = false
+type = "audio_visualizer"
+width = 40
+
+[widget.launcher]
+color = "on_surface"
+
+[widget.media]
+art_size = 18.0
+hide_when_no_media = true
+max_length = 240.0
+title_scroll = "always"
+
+[widget.network]
+color = "on_surface"
+show_label = false
+
+[widget.notifications]
+color = "on_surface"
+
+[widget.session]
+color = "on_surface"
+
+[widget.tray]
+capsule = false
+
+[widget.volume]
+color = "on_surface"
+
+[widget.workspaces]
+capsule = false

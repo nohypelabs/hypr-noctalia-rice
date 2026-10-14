@@ -1,0 +1,13 @@
+id = "dracarys/uptime"
+name = "Uptime"
+version = "1.0.0"
+plugin_api = 24
+author = "dracarys"
+license = "MIT"
+tags = ["bar", "system"]
+icon = "clock-up"
+description = "Lama laptop menyala sejak boot terakhir (dibaca dari /proc/uptime)."
+
+[[widget]]
+id = "bar"
+entry = "bar.luau"

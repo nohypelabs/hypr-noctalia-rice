@@ -1,0 +1,6 @@
+#!/bin/sh
+# Kirim perintah ke daemon keyhud: show <idx> | cheatsheet | toggle-osd
+# Gagal diam-diam (exit 1) kalau daemon gak jalan, biar bisa di-fallback pakai ||.
+sock="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/keyhud.sock"
+[ -S "$sock" ] || exit 1
+printf '%s' "$*" | timeout 0.5 socat -u - "UNIX-SENDTO:$sock" 2>/dev/null

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Pembungkus: gtk4-layer-shell wajib di-preload sebelum libwayland (aturan dari upstream untuk Python).
+# Nyalakan ulang kalau mati gak normal (crash renderer / pkill); berhenti kalau keluar
+# normal (exit 0: Hyprland selesai atau instance lain sudah jalan).
+while :; do
+  env LD_PRELOAD=/usr/lib/libgtk4-layer-shell.so python3 "$HOME/.local/lib/wsstrip/wsstrip.py" "$@" && exit 0
+  [ -S "$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket.sock" ] || exit 0
+  sleep 1
+done
