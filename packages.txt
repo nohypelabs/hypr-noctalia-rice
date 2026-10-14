@@ -16,8 +16,9 @@ python-gobject
 python-cairo
 socat
 
-# --- spotlight: salin hasil kalkulator ---
+# --- spotlight: salin hasil kalkulator, latar blur Launchpad ---
 wl-clipboard
+python-pillow
 
 # --- screenshot, media, layar ---
 grim

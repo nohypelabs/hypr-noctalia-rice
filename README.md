@@ -7,6 +7,8 @@ Kalau kepakai, kasih ⭐ ya. Issue dan PR juga dipersilakan.
 
 ![Desktop dengan strip workspace ter-pin](screenshots/desktop-pinned.png)
 
+![Launchpad](screenshots/launchpad.png)
+
 | Spotlight (Super+Space) | Kalkulator inline di Spotlight |
 |---|---|
 | ![Spotlight](screenshots/spotlight.png) | ![Kalkulator Spotlight](screenshots/spotlight-calc.png) |
@@ -40,6 +42,7 @@ Kalau kepakai, kasih ⭐ ya. Issue dan PR juga dipersilakan.
 | **Hyprland** (`~/.config/hypr`, config Lua) | Dekorasi squircle + blur, animasi pegas ala iOS, perpindahan workspace vertikal, swipe 4 jari atas/bawah, mode layar proyektor |
 | **noctalia** (`~/.local/state/noctalia/settings.toml`) | Bar "Dynamic Island", dock ngambang + magnifikasi, lock screen ala iOS, hot corner, Night Light, plugin `uptime` & `spotlight` (tombol kaca pembesar di bar) |
 | **spotlight** | Launcher ala Spotlight macOS: awalnya cuma bar pencarian, hasil Top Hit / Aplikasi muncul saat mengetik, kalkulator inline (Enter = salin), cari di web. Aplikasi yang sering dibuka naik ke atas |
+| **Launchpad** (bagian dari daemon spotlight) | Grid ikon semua aplikasi layar penuh ala macOS: 7×5 per halaman, latar desktop diblur, pencarian, geser halaman pakai touchpad/scroll/←→. Dibuka lewat ikon di dock, Super+G, atau cubit 4 jari |
 | **wsstrip** | Strip workspace di kiri (kartu 3D gaya Stage Manager). Muncul saat kursor di tepi kiri, bisa di-pin jadi kolom tetap (5 workspace, yang kosong disembunyikan) |
 | **keyhud** | HUD kecil tiap kali keybind ditekan + cheatsheet (Super+/) |
 | **noctalia-keepalive** | Menyalakan ulang noctalia kalau mati (mis. setelah suspend) |
@@ -187,6 +190,7 @@ Lalu tes langsung:
 - [ ] **Super+/** membuka cheatsheet keybind.
 - [ ] Kursor ditempel ke tepi kiri layar (bagian tengah) → strip workspace geser masuk.
 - [ ] **Super+Ctrl+Tab** → strip ter-pin, window bergeser ke kanan.
+- [ ] Ikon grid warna-warni paling kiri di dock (atau **Super+G**) membuka Launchpad.
 - [ ] **Super+Space** membuka Spotlight. Ketik `12*7` → muncul hasil kalkulator. **Super+L** mengunci layar.
 - [ ] Swipe 4 jari ke atas/bawah di touchpad pindah workspace.
 
@@ -213,6 +217,7 @@ Daftar lengkap: **Super+/**.
 |---|---|
 | Super+Enter / Super+\` | Terminal / terminal dropdown |
 | Super+Space | Spotlight (↑↓ pilih, Enter buka, Esc hapus/tutup) |
+| Super+G / ikon grid di dock / cubit 4 jari | Launchpad (ketik untuk cari, ←→ atau geser touchpad ganti halaman, Esc tutup) |
 | Super+E | File manager (yazi) |
 | Super+Q / Super+Esc | Tutup window |
 | Super+F | Layar penuh |
@@ -229,6 +234,7 @@ Daftar lengkap: **Super+/**.
 | Super+P | Atur monitor (nwg-displays) |
 | Super+Shift+P / Super+Ctrl+P | Proyektor: duplikat / perpanjang |
 | swipe 4 jari ↑↓ | Pindah workspace |
+| cubit 4 jari | Launchpad |
 | swipe 3 jari ↑ / ↓ / ← | Fullscreen / tutup / float |
 
 Hot corner: kanan atas = control center, kiri bawah = Spotlight, kanan bawah = kunci layar.

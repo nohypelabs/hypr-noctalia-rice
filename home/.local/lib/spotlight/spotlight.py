@@ -2,14 +2,17 @@
 
 Daemon GTK4 + gtk4-layer-shell (pola sama dengan keyhud/wsstrip). Awalnya cuma bar
 pencarian di tengah atas; hasil (Top Hit, Aplikasi, Kalkulator, Cari di web) muncul
-di bawahnya saat mengetik. Perintah lewat socket datagram $XDG_RUNTIME_DIR/spotlight.sock
-(pakai spotlight-send): toggle | show | hide | query <teks>.
+di bawahnya saat mengetik. Daemon yang sama juga memegang Launchpad: layar penuh berisi
+grid ikon semua aplikasi per halaman, latar = desktop yang diblur.
+Perintah lewat socket datagram $XDG_RUNTIME_DIR/spotlight.sock (pakai spotlight-send):
+toggle | show | hide | query <teks> | launchpad | launchpad-hide | launchpad-page <n>.
 
 Ikon aplikasi dirasterisasi jadi bitmap (lihat wsstrip): ikon SVG yang digambar sebagai
 path vektor di dalam widget beranimasi bikin renderer GSK GTK 4.24 abort.
 """
 import ast
 import json
+import threading
 import math
 import operator
 import os
@@ -35,6 +38,13 @@ WIDTH = 680
 TOP_RATIO = 0.22            # jarak bar dari atas layar (proporsi tinggi monitor)
 MAX_APPS = 7
 WEB_SEARCH = "https://duckduckgo.com/?q={}"
+LP_ICON = 76                # ukuran ikon Launchpad
+LP_CELL_W, LP_CELL_H = 150, 128
+LP_MAX_COLS, LP_MAX_ROWS = 7, 5   # sama dengan Launchpad macOS
+LP_BG = os.path.join(RUNTIME, "spotlight-launchpad-bg.png")
+# rice-launchpad.desktop sengaja TANPA NoDisplay (dock noctalia gak mau baca ikon entri
+# NoDisplay), jadi disaring di sini
+SELF_IDS = {"rice-launchpad.desktop"}
 
 CSS = """
 window.spotlight { background: rgba(0, 0, 0, 0.01); font-family: "Inter", sans-serif; }
@@ -70,6 +80,32 @@ entry.query text placeholder { color: rgba(235, 235, 245, 0.35); }
 .row .glyph { color: rgba(235, 235, 245, 0.75); font-family: "JetBrainsMono Nerd Font"; font-size: 20px;
   min-width: 28px; }
 .row.top .glyph { font-size: 28px; min-width: 40px; }
+
+/* ---- Launchpad ---- */
+window.launchpad { background: rgba(0, 0, 0, 0.01); font-family: "Inter", sans-serif; }
+.lp-tint { background: rgba(16, 16, 22, 0.45); }
+.lp-bg { opacity: 0; transition: opacity 220ms ease-out; }
+.lp-bg.on { opacity: 1; }
+.lp-content {
+  opacity: 0; transform: scale(1.08);
+  transition: opacity 180ms ease-out, transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.lp-content.on { opacity: 1; transform: none; }
+entry.lp-search {
+  background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 9px; box-shadow: none; min-height: 30px; padding: 0 10px;
+  color: #ffffff; font-size: 14px; caret-color: #ffffff;
+}
+entry.lp-search text placeholder { color: rgba(255, 255, 255, 0.55); }
+.lp-cell { border-radius: 16px; padding: 8px 4px; }
+.lp-cell image { transition: transform 140ms ease-out; }
+.lp-cell:hover image { transform: scale(1.08); }
+.lp-cell.sel { background: rgba(255, 255, 255, 0.16); }
+.lp-name { color: #ffffff; font-size: 12px; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); margin-top: 6px; }
+.lp-dot { min-width: 8px; min-height: 8px; border-radius: 4px; margin: 0 5px;
+  background: rgba(255, 255, 255, 0.35); }
+.lp-dot.on { background: rgba(255, 255, 255, 0.95); }
+.lp-empty { color: rgba(255, 255, 255, 0.6); font-size: 15px; }
 """
 
 # ---------------------------------------------------------------------------
@@ -91,9 +127,12 @@ def icon_texture(gicon, size):
         if path:
             try:
                 pb = GdkPixbuf.Pixbuf.new_from_file_at_size(path, size * 2, size * 2)
-                ok, buf = pb.save_to_bufferv("png", [], [])
-                if ok:
-                    tex = Gdk.Texture.new_from_bytes(GLib.Bytes.new(buf))
+                if not pb.get_has_alpha():
+                    pb = pb.add_alpha(False, 0, 0, 0)
+                # langsung dari piksel (tanpa encode PNG): ~2x lebih cepat
+                tex = Gdk.MemoryTexture.new(pb.get_width(), pb.get_height(),
+                                            Gdk.MemoryFormat.R8G8B8A8, pb.read_pixel_bytes(),
+                                            pb.get_rowstride())
             except GLib.Error:
                 tex = None
     _tex[key] = tex
@@ -183,6 +222,8 @@ class Apps:
         for a in Gio.AppInfo.get_all():
             if not a.should_show() or not isinstance(a, GioUnix.DesktopAppInfo):
                 continue
+            if a.get_id() in SELF_IDS:   # entri dock Launchpad sendiri jangan ikut di grid
+                continue
             kw = " ".join(a.get_keywords() or [])
             items.append({
                 "id": a.get_id(), "info": a, "name": a.get_display_name() or a.get_name(),
@@ -231,6 +272,16 @@ class Apps:
 # ---------------------------------------------------------------------------
 # UI
 # ---------------------------------------------------------------------------
+def launch_app(apps, it):
+    apps.bump(it["id"])
+    # sesi uwsm: jalankan sebagai unit systemd terpisah (gak ikut mati bareng daemon ini)
+    if any(k.startswith("UWSM_") for k in os.environ) and GLib.find_program_in_path("uwsm"):
+        subprocess.Popen(["uwsm", "app", "--", it["id"]], stdout=subprocess.DEVNULL,
+                         stderr=subprocess.DEVNULL, start_new_session=True)
+    else:
+        it["info"].launch([], None)
+
+
 def focused_monitor(display):
     try:
         out = subprocess.run(["hyprctl", "-j", "monitors"], capture_output=True, text=True,
@@ -461,13 +512,296 @@ class Spotlight:
         self.hide()
 
     def launch(self, it):
-        self.apps.bump(it["id"])
-        # sesi uwsm: jalankan sebagai unit systemd terpisah (gak ikut mati bareng daemon ini)
-        if any(k.startswith("UWSM_") for k in os.environ) and GLib.find_program_in_path("uwsm"):
-            subprocess.Popen(["uwsm", "app", "--", it["id"]], stdout=subprocess.DEVNULL,
-                             stderr=subprocess.DEVNULL, start_new_session=True)
+        launch_app(self.apps, it)
+
+
+class Launchpad:
+    """Grid ikon semua aplikasi, layar penuh, per halaman (ala Launchpad macOS)."""
+
+    def __init__(self, app, apps):
+        self.app, self.apps = app, apps
+        self.pages, self.page, self.cells, self.sel = [], 0, [], -1
+        self.cols, self.rows = LP_MAX_COLS, LP_MAX_ROWS
+        self.unmap_id = None
+        self.scroll_acc, self.scroll_lock = 0.0, False
+        self.built_for = None
+
+        self.win = Gtk.Window(application=app)
+        self.win.add_css_class("launchpad")
+        LS.init_for_window(self.win)
+        LS.set_namespace(self.win, "launchpad")
+        LS.set_layer(self.win, LS.Layer.OVERLAY)
+        for e in (LS.Edge.TOP, LS.Edge.BOTTOM, LS.Edge.LEFT, LS.Edge.RIGHT):
+            LS.set_anchor(self.win, e, True)
+        LS.set_exclusive_zone(self.win, -1)
+        LS.set_keyboard_mode(self.win, LS.KeyboardMode.NONE)
+
+        over = Gtk.Overlay()
+        self.bg = Gtk.Picture(content_fit=Gtk.ContentFit.COVER, can_shrink=True)
+        self.bg.add_css_class("lp-bg")
+        over.set_child(self.bg)
+        tint = Gtk.Box(hexpand=True, vexpand=True)
+        tint.add_css_class("lp-tint")
+        over.add_overlay(tint)
+
+        self.content = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.content.add_css_class("lp-content")
+        self.entry = Gtk.Entry(placeholder_text="Cari", width_request=260,
+                               halign=Gtk.Align.CENTER, margin_top=56)
+        self.entry.add_css_class("lp-search")
+        self.entry.connect("changed", lambda *_: self.rebuild())
+        self.entry.connect("activate", lambda *_: self._activate_sel())
+        self.content.append(self.entry)
+        self.stack = Gtk.Stack(vexpand=True, transition_duration=320,
+                               transition_type=Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
+        self.content.append(self.stack)
+        self.dots = Gtk.Box(halign=Gtk.Align.CENTER, margin_bottom=56)
+        self.content.append(self.dots)
+        over.add_overlay(self.content)
+        self.win.set_child(over)
+
+        keys = Gtk.EventControllerKey()
+        keys.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+        keys.connect("key-pressed", self._on_key)
+        self.win.add_controller(keys)
+        scroll = Gtk.EventControllerScroll(flags=Gtk.EventControllerScrollFlags.BOTH_AXES)
+        scroll.connect("scroll", self._on_scroll)
+        scroll.connect("scroll-end", lambda *_: setattr(self, "scroll_acc", 0.0))
+        self.win.add_controller(scroll)
+        click = Gtk.GestureClick()
+        click.connect("released", self._on_click)
+        self.win.add_controller(click)
+
+    # ---- tampil/sembunyi ---------------------------------------------------
+    @property
+    def shown(self):
+        return self.win.get_visible() and self.unmap_id is None
+
+    def toggle(self):
+        self.hide() if self.shown else self.show()
+
+    def show(self):
+        if self.unmap_id:
+            GLib.source_remove(self.unmap_id)
+            self.unmap_id = None
+        mon = focused_monitor(self.win.get_display())
+        if mon:
+            LS.set_monitor(self.win, mon)
+            g = mon.get_geometry()
+            self.cols = max(4, min(LP_MAX_COLS, (g.width - 200) // LP_CELL_W))
+            self.rows = max(3, min(LP_MAX_ROWS, (g.height - 260) // (LP_CELL_H + 12)))
+        self.apps.refresh()
+        self.entry.set_text("")
+        self.rebuild(force=True)
+        if self.win.get_visible():
+            self._present()
+            return
+        self._presented = False
+        self.mon = mon
+        if os.path.exists(LP_BG):
+            # latar = foto desktop dari penutupan sebelumnya (sudah diblur berat, beda
+            # sedikit gak kelihatan) -> Launchpad bisa langsung muncul
+            self._bg_ready = True
+            self._present()
         else:
-            it["info"].launch([], None)
+            # pertama kali: foto dulu sebelum Launchpad kelihatan, tunggu maks 300 ms
+            self.bg.remove_css_class("on")
+            self.bg.set_paintable(None)
+            self._grab_background(mon)
+            GLib.timeout_add(300, lambda: (self._present(), False)[1])
+
+    def _present(self):
+        if getattr(self, "_presented", True) and self.win.get_visible():
+            return
+        self._presented = True
+        LS.set_keyboard_mode(self.win, LS.KeyboardMode.EXCLUSIVE)
+        self.content.remove_css_class("on")
+        self.win.present()
+        GLib.timeout_add(16, lambda: (self.content.add_css_class("on"), False)[1])
+        self.entry.grab_focus()
+        if os.path.exists(LP_BG) and self._bg_ready:
+            self._set_background()
+
+    def hide(self):
+        if not self.win.get_visible() or self.unmap_id:
+            return
+        self.content.remove_css_class("on")
+        self.bg.remove_css_class("on")
+        LS.set_keyboard_mode(self.win, LS.KeyboardMode.NONE)
+        self.unmap_id = GLib.timeout_add(200, self._unmap)
+
+    def _unmap(self):
+        self.unmap_id = None
+        self.win.set_visible(False)
+        # perbarui foto latar buat pembukaan berikutnya, setelah aplikasi sempat muncul
+        GLib.timeout_add(1500, self._refresh_bg_later)
+        return False
+
+    def _refresh_bg_later(self):
+        if not self.win.get_visible():
+            self._grab_background(getattr(self, "mon", None), present=False)
+        return False
+
+    # Latar = layar sekarang, diperkecil + blur (grim + Pillow di thread terpisah). Strip
+    # dipanggil sebelum window tampil, jadi Launchpad sendiri gak ikut kefoto.
+    def _grab_background(self, mon, present=True):
+        name = mon.get_connector() if mon else None
+        if present:
+            self._bg_ready = False
+
+        def work():
+            try:
+                cmd = ["grim", "-s", "0.25", "-t", "ppm", "-"]
+                if name:
+                    cmd[1:1] = ["-o", name]
+                raw = subprocess.run(cmd, capture_output=True, timeout=2).stdout
+                from io import BytesIO
+                from PIL import Image, ImageEnhance, ImageFilter
+                im = Image.open(BytesIO(raw)).convert("RGB")
+                im = im.filter(ImageFilter.GaussianBlur(10))
+                im = ImageEnhance.Brightness(im).enhance(0.8)
+                im.save(LP_BG + ".tmp.png")
+                os.replace(LP_BG + ".tmp.png", LP_BG)
+            except Exception:   # Pillow/grim gak ada: cukup latar gelap polos
+                if present:
+                    GLib.idle_add(lambda: (self._present(), False)[1])
+                return
+            if present:
+                self._bg_ready = True
+                GLib.idle_add(lambda: (self._present(), self._set_background(), False)[2])
+        threading.Thread(target=work, daemon=True).start()
+
+    def _set_background(self):
+        if self.win.get_visible():
+            # muat lewat texture baru (Gio.File sama bisa kena cache Picture)
+            try:
+                self.bg.set_paintable(Gdk.Texture.new_from_filename(LP_BG))
+            except GLib.Error:
+                return False
+            self.bg.add_css_class("on")
+        return False
+
+    # ---- grid --------------------------------------------------------------
+    def rebuild(self, force=False):
+        q = self.entry.get_text().strip()
+        items = self.apps.search(q) if q else sorted(self.apps.items,
+                                                      key=lambda it: it["name"].lower())
+        key = (q, self.cols, self.rows, len(self.apps.items))
+        if not force and key == self.built_for:
+            return
+        self.built_for = key
+        while (c := self.stack.get_first_child()) is not None:
+            self.stack.remove(c)
+        per = self.cols * self.rows
+        self.pages, self.cells = [], []
+        for start in range(0, max(len(items), 1), per):
+            grid = Gtk.Grid(column_homogeneous=True, row_homogeneous=True, row_spacing=12,
+                            halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER)
+            for i, it in enumerate(items[start:start + per]):
+                cell = self._cell(it)
+                grid.attach(cell, i % self.cols, i // self.cols, 1, 1)
+                self.cells.append(cell)
+            if not items:
+                lbl = Gtk.Label(label="Gak ada aplikasi yang cocok")
+                lbl.add_css_class("lp-empty")
+                grid.attach(lbl, 0, 0, 1, 1)
+            name = f"p{len(self.pages)}"
+            self.stack.add_named(grid, name)
+            self.pages.append(name)
+        self.sel = 0 if (q and self.cells) else -1
+        self._paint_sel()
+        self.goto(0, animate=False)
+
+    def _cell(self, it):
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, width_request=LP_CELL_W,
+                      height_request=LP_CELL_H, halign=Gtk.Align.CENTER, valign=Gtk.Align.START)
+        box.add_css_class("lp-cell")
+        box.it = it
+        tex = icon_texture(it["info"].get_icon(), LP_ICON)
+        img = Gtk.Image.new_from_paintable(tex) if tex else Gtk.Image.new_from_icon_name(
+            "application-x-executable")
+        img.set_pixel_size(LP_ICON)
+        box.append(img)
+        lbl = Gtk.Label(label=it["name"], ellipsize=3, max_width_chars=16, justify=2)
+        lbl.add_css_class("lp-name")
+        box.append(lbl)
+        box.set_cursor(Gdk.Cursor.new_from_name("pointer"))
+        return box
+
+    def goto(self, n, animate=True):
+        if not self.pages:
+            return
+        n = max(0, min(n, len(self.pages) - 1))
+        self.stack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT if animate
+                                       else Gtk.StackTransitionType.NONE)
+        self.page = n
+        self.stack.set_visible_child_name(self.pages[n])
+        while (c := self.dots.get_first_child()) is not None:
+            self.dots.remove(c)
+        self.dots.set_visible(len(self.pages) > 1)
+        for i in range(len(self.pages)):
+            d = Gtk.Box()
+            d.add_css_class("lp-dot")
+            if i == n:
+                d.add_css_class("on")
+            self.dots.append(d)
+
+    def _paint_sel(self):
+        for i, c in enumerate(self.cells):
+            (c.add_css_class if i == self.sel else c.remove_css_class)("sel")
+
+    def _activate_sel(self):
+        if 0 <= self.sel < len(self.cells):
+            self._launch(self.cells[self.sel].it)
+
+    def _launch(self, it):
+        launch_app(self.apps, it)
+        self.hide()
+
+    # ---- input -------------------------------------------------------------
+    def _on_key(self, ctl, keyval, code, state):
+        name = Gdk.keyval_name(keyval) or ""
+        typing = bool(self.entry.get_text())
+        if name == "Escape":
+            if typing:
+                self.entry.set_text("")
+            else:
+                self.hide()
+            return True
+        if name in ("Page_Down",) or (name == "Right" and not typing):
+            self.goto(self.page + 1)
+            return True
+        if name in ("Page_Up",) or (name == "Left" and not typing):
+            self.goto(self.page - 1)
+            return True
+        if typing and name in ("Right", "Left", "Down", "Up", "Tab") and self.cells:
+            step = {"Right": 1, "Tab": 1, "Left": -1, "Down": self.cols, "Up": -self.cols}[name]
+            self.sel = max(0, min(len(self.cells) - 1, self.sel + step))
+            self._paint_sel()
+            return True
+        return False
+
+    def _on_scroll(self, ctl, dx, dy):
+        # touchpad: geser horizontal (atau vertikal) = ganti halaman, sekali per gerakan
+        if self.scroll_lock:
+            return True
+        self.scroll_acc += dx if abs(dx) > abs(dy) else dy
+        if abs(self.scroll_acc) >= 1.5:
+            self.goto(self.page + (1 if self.scroll_acc > 0 else -1))
+            self.scroll_acc, self.scroll_lock = 0.0, True
+            GLib.timeout_add(350, lambda: (setattr(self, "scroll_lock", False), False)[1])
+        return True
+
+    def _on_click(self, gesture, n, x, y):
+        w = self.win.pick(x, y, Gtk.PickFlags.DEFAULT)
+        while w is not None:
+            if hasattr(w, "it"):
+                self._launch(w.it)
+                return
+            if w is self.entry or w is self.dots:
+                return
+            w = w.get_parent()
+        self.hide()   # klik area kosong = tutup (kayak macOS)
 
 
 class App(Gtk.Application):
@@ -482,6 +816,17 @@ class App(Gtk.Application):
             Gdk.Display.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 10)
         self.ui = Spotlight(self)
         self.ui.apps.refresh()
+        self.lp = Launchpad(self, self.ui.apps)
+        # siapkan ikon semua aplikasi di latar biar Launchpad/Spotlight pertama gak nunggu
+        todo = [it["info"].get_icon() for it in self.ui.apps.items if it["info"].get_icon()]
+
+        def warm():
+            for gicon in todo[:6]:
+                for size in (LP_ICON, 28, 40):
+                    icon_texture(gicon, size)
+            del todo[:6]
+            return bool(todo)
+        GLib.idle_add(warm, priority=GLib.PRIORITY_LOW)
         try:
             os.unlink(SOCK)
         except FileNotFoundError:
@@ -493,11 +838,19 @@ class App(Gtk.Application):
     def _on_msg(self, fd, cond):
         cmd = self.sock.recv(512).decode(errors="ignore").strip()
         if cmd == "toggle":
+            self.lp.hide()
             self.ui.toggle()
         elif cmd == "show":
             self.ui.show()
         elif cmd == "hide":
             self.ui.hide()
+        elif cmd == "launchpad":
+            self.ui.hide()
+            self.lp.toggle()
+        elif cmd == "launchpad-hide":
+            self.lp.hide()
+        elif cmd.startswith("launchpad-page "):   # dipakai buat tes/screenshot
+            self.lp.goto(int(cmd.split()[1]) - 1)
         elif cmd.startswith("query "):   # buka dengan teks terisi (dipakai buat tes)
             self.ui.show()
             self.ui.entry.set_text(cmd[6:])

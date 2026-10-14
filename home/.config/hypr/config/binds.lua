@@ -197,6 +197,7 @@ hl.bind("XF86PowerOff", noctalia("session lock"), { locked = true })
 hl.bind(mainMod .. " + BackSpace", hl.dsp.workspace.toggle_special("magic"))    -- scratchpad alt
 hl.bind(mainMod .. " + slash", shell(keyhudSend .. " cheatsheet || " .. hyprScripts .. "/cheatsheet.sh")) -- daftar keybind (keyhud, fallback kitty)
 hl.bind(mainMod .. " + SHIFT + slash", shell(keyhudSend .. " toggle-osd"))       -- HUD keybind on/off
+hl.bind(mainMod .. " + G", shell(os.getenv("HOME") .. "/.local/bin/spotlight-send launchpad")) -- Launchpad: grid semua aplikasi
 hl.bind(mainMod .. " + Tab", shell(os.getenv("HOME") .. "/.local/bin/wsstrip-send toggle")) -- strip workspace kiri ala Spaces (wsstrip)
 hl.bind(mainMod .. " + SHIFT + Tab", shell(os.getenv("HOME") .. "/.local/bin/wsstrip-send anim")) -- ganti gaya animasi strip workspace
 hl.bind(mainMod .. " + CTRL + Tab", shell(os.getenv("HOME") .. "/.local/bin/wsstrip-send pin")) -- pin/lepas strip workspace (makan ruang desktop)

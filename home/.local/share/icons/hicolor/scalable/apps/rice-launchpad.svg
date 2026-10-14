@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Ikon Launchpad rice ini: kaca gelap squircle + grid 3x3 warna-warni (bukan aset Apple) -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a4f5c"/><stop offset="1" stop-color="#1c1e24"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#bg)"/>
+  <rect x="8.5" y="8.5" width="111" height="111" rx="27.5" fill="none" stroke="#ffffff" stroke-opacity=".18"/>
+  <g>
+    <rect x="28" y="28" width="20" height="20" rx="6" fill="#ff5f57"/>
+    <rect x="54" y="28" width="20" height="20" rx="6" fill="#febc2e"/>
+    <rect x="80" y="28" width="20" height="20" rx="6" fill="#28c840"/>
+    <rect x="28" y="54" width="20" height="20" rx="6" fill="#0a84ff"/>
+    <rect x="54" y="54" width="20" height="20" rx="6" fill="#bf5af2"/>
+    <rect x="80" y="54" width="20" height="20" rx="6" fill="#ff375f"/>
+    <rect x="28" y="80" width="20" height="20" rx="6" fill="#64d2ff"/>
+    <rect x="54" y="80" width="20" height="20" rx="6" fill="#ff9f0a"/>
+    <rect x="80" y="80" width="20" height="20" rx="6" fill="#30d158"/>
+  </g>
+</svg>

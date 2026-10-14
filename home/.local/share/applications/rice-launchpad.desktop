@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Launchpad
+Comment=Semua aplikasi dalam grid layar penuh
+Icon=@HOME@/.local/share/icons/hicolor/scalable/apps/rice-launchpad.svg
+Exec=@HOME@/.local/bin/spotlight-send launchpad
+Categories=System;

@@ -19,6 +19,10 @@ hl.config({
 })
 
 hl.gesture({ fingers = 4, direction = "vertical",   action = "workspace" }) -- vertikal, searah animasi slidevert
+-- cubit 4 jari = Launchpad (kayak trackpad Mac)
+hl.gesture({ fingers = 4, direction = "pinchin", action = function()
+    hl.dispatch(hl.dsp.exec_cmd(os.getenv("HOME") .. "/.local/bin/spotlight-send launchpad"))
+end })
 hl.gesture({ fingers = 3, direction = "down",       action = "close" })
 hl.gesture({ fingers = 3, direction = "up",         action = "fullscreen" })
 hl.gesture({ fingers = 3, direction = "left",       action = "float" })
