@@ -429,6 +429,9 @@ panel_anchor_bar = "default"
 
     [shell.panel]
     clipboard_placement = "attached"
+    control_center_placement = "floating"
+    control_center_position = "top_right"
+    open_near_click_control_center = false
     floating_offset = 170
     launcher_position = "top_center"
     polkit_position = "auto"
