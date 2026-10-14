@@ -1,0 +1,13 @@
+id = "dracarys/spotlight"
+name = "Spotlight"
+version = "1.0.0"
+plugin_api = 24
+author = "dracarys"
+license = "MIT"
+tags = ["bar", "launcher"]
+icon = "search"
+description = "Tombol kaca pembesar di bar yang membuka launcher Spotlight (~/.local/bin/spotlight-send)."
+
+[[widget]]
+id = "bar"
+entry = "bar.luau"

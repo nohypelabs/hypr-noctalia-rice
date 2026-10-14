@@ -12,7 +12,7 @@
 
 local mainMod = _G.mainMod or "SUPER"
 local terminal = TERMINAL or "kitty"  -- variables.lua CachyOS
-local menu = "noctalia msg panel-toggle launcher"  -- launcher Noctalia (fuzzel tidak dipakai)
+local menu = os.getenv("HOME") .. "/.local/bin/spotlight-send toggle || noctalia msg panel-toggle launcher"  -- launcher Spotlight (~/.local/lib/spotlight), cadangan launcher noctalia
 local hyprScripts = os.getenv("HOME") .. "/.config/hypr/scripts"
 
 -- exec_cmd dijalanin lewat /bin/sh, jadi pipe / $(...) / || aman ditulis langsung.

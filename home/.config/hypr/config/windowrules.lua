@@ -133,3 +133,10 @@ hl.layer_rule({
   match = { namespace = "^wsstrip(-edge)?$" },
   no_anim = true,
 })
+
+-- spotlight (~/.local/lib/spotlight) animasi muncul sendiri lewat CSS
+hl.layer_rule({
+  name = "spotlight",
+  match = { namespace = "^spotlight$" },
+  no_anim = true,
+})

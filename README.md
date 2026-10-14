@@ -7,9 +7,13 @@ Kalau kepakai, kasih ⭐ ya. Issue dan PR juga dipersilakan.
 
 ![Desktop dengan strip workspace ter-pin](screenshots/desktop-pinned.png)
 
-| Strip workspace (mode hover, kartu 3D) | Launcher ala Spotlight | Cheatsheet keybind (Super+/) |
-|---|---|---|
-| ![Strip workspace mode hover](screenshots/strip-hover.png) | ![Launcher](screenshots/launcher.png) | ![Cheatsheet](screenshots/cheatsheet.png) |
+| Spotlight (Super+Space) | Kalkulator inline di Spotlight |
+|---|---|
+| ![Spotlight](screenshots/spotlight.png) | ![Kalkulator Spotlight](screenshots/spotlight-calc.png) |
+
+| Strip workspace (mode hover, kartu 3D) | Cheatsheet keybind (Super+/) |
+|---|---|
+| ![Strip workspace mode hover](screenshots/strip-hover.png) | ![Cheatsheet](screenshots/cheatsheet.png) |
 
 - [Isi rice](#isi-rice)
 - [Tutorial pasang dari nol](#tutorial-pasang-dari-nol)
@@ -34,7 +38,8 @@ Kalau kepakai, kasih ⭐ ya. Issue dan PR juga dipersilakan.
 | Bagian | Keterangan |
 |---|---|
 | **Hyprland** (`~/.config/hypr`, config Lua) | Dekorasi squircle + blur, animasi pegas ala iOS, perpindahan workspace vertikal, swipe 4 jari atas/bawah, mode layar proyektor |
-| **noctalia** (`~/.local/state/noctalia/settings.toml`) | Bar "Dynamic Island", dock ngambang + magnifikasi, launcher ala Spotlight, lock screen ala iOS, hot corner, Night Light, plugin `uptime` |
+| **noctalia** (`~/.local/state/noctalia/settings.toml`) | Bar "Dynamic Island", dock ngambang + magnifikasi, lock screen ala iOS, hot corner, Night Light, plugin `uptime` & `spotlight` (tombol kaca pembesar di bar) |
+| **spotlight** | Launcher ala Spotlight macOS: awalnya cuma bar pencarian, hasil Top Hit / Aplikasi muncul saat mengetik, kalkulator inline (Enter = salin), cari di web. Aplikasi yang sering dibuka naik ke atas |
 | **wsstrip** | Strip workspace di kiri (kartu 3D gaya Stage Manager). Muncul saat kursor di tepi kiri, bisa di-pin jadi kolom tetap (5 workspace, yang kosong disembunyikan) |
 | **keyhud** | HUD kecil tiap kali keybind ditekan + cheatsheet (Super+/) |
 | **noctalia-keepalive** | Menyalakan ulang noctalia kalau mati (mis. setelah suspend) |
@@ -52,7 +57,7 @@ hypr-noctalia-rice/
 ├── screenshots/    # gambar README
 └── home/           # cermin isi $HOME (path home ditulis @HOME@)
     ├── .config/{hypr,noctalia,kitty,qt6ct,uwsm}
-    ├── .local/{bin,lib,share/noctalia-plugins,state/noctalia}
+    ├── .local/{bin,lib,share/noctalia-plugins,state/noctalia}   # bin+lib: wsstrip, keyhud, spotlight
     └── Pictures/Wallpapers
 ```
 
@@ -172,6 +177,7 @@ hyprctl configerrors                        # harus kosong
 pgrep -a noctalia                           # bar & dock
 pgrep -af keyhud.py                         # HUD keybind
 pgrep -af wsstrip.py                        # strip workspace
+pgrep -af spotlight.py                      # launcher Spotlight
 noctalia msg plugins list | grep uptime     # plugin uptime aktif
 ```
 
@@ -181,7 +187,7 @@ Lalu tes langsung:
 - [ ] **Super+/** membuka cheatsheet keybind.
 - [ ] Kursor ditempel ke tepi kiri layar (bagian tengah) → strip workspace geser masuk.
 - [ ] **Super+Ctrl+Tab** → strip ter-pin, window bergeser ke kanan.
-- [ ] **Super+Space** membuka launcher, **Super+L** mengunci layar.
+- [ ] **Super+Space** membuka Spotlight. Ketik `12*7` → muncul hasil kalkulator. **Super+L** mengunci layar.
 - [ ] Swipe 4 jari ke atas/bawah di touchpad pindah workspace.
 
 ### 7. Sesuaikan dengan mesin
@@ -206,7 +212,7 @@ Daftar lengkap: **Super+/**.
 | Tombol | Aksi |
 |---|---|
 | Super+Enter / Super+\` | Terminal / terminal dropdown |
-| Super+Space | Launcher (ala Spotlight) |
+| Super+Space | Spotlight (↑↓ pilih, Enter buka, Esc hapus/tutup) |
 | Super+E | File manager (yazi) |
 | Super+Q / Super+Esc | Tutup window |
 | Super+F | Layar penuh |
@@ -225,7 +231,7 @@ Daftar lengkap: **Super+/**.
 | swipe 4 jari ↑↓ | Pindah workspace |
 | swipe 3 jari ↑ / ↓ / ← | Fullscreen / tutup / float |
 
-Hot corner: kanan atas = control center, kiri bawah = launcher, kanan bawah = kunci layar.
+Hot corner: kanan atas = control center, kiri bawah = Spotlight, kanan bawah = kunci layar.
 
 ---
 
@@ -263,6 +269,7 @@ File yang sebelumnya **belum ada** gak ikut dibackup. Hapus manual kalau perlu: 
 | Masuk Hyprland tapi layar kosong / config error | Versi Hyprland < 0.56 (gak kenal config Lua). Cek `hyprctl version`, lalu update sistem. Detail error: `hyprctl configerrors`. |
 | Bar & dock gak muncul | Jalankan `noctalia` dari terminal untuk lihat error-nya. Pastikan terpasang (`pacman -Q noctalia` atau `noctalia-git`). |
 | Strip workspace / HUD gak muncul | `python3 -c 'import gi; gi.require_version("Gtk4LayerShell","1.0")'` harus tanpa error. Kalau gagal: `sudo pacman -S gtk4-layer-shell python-gobject python-cairo`. Untuk lihat error-nya: `pkill -f 'bin/wsstrip$'; pkill -f wsstrip.py; ~/.local/bin/wsstrip` dari terminal. |
+| Super+Space membuka launcher lama noctalia | Daemon Spotlight gak jalan (itu cadangannya). Cek `pgrep -af spotlight.py`, jalankan `~/.local/bin/spotlight` dari terminal buat lihat error. |
 | Strip muncul lalu kedip/hilang sebentar | Program strip crash lalu dinyalakan ulang otomatis. Cek `coredumpctl list python3` dan laporkan. |
 | Ikon/kursor masih bawaan | Clone MacTahoe gagal saat install. Jalankan `./install.sh --no-backup` lagi saat online, atau pasang dari AUR: `paru -S mactahoe-icon-theme-git mactahoe-cursor-theme-git`. |
 | Font aneh / kotak-kotak di bar | Font belum ada: `sudo pacman -S inter-font ttf-jetbrains-mono-nerd`, lalu logout. |

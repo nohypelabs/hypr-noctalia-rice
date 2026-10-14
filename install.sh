@@ -114,7 +114,7 @@ install_files() {
     [[ $want != "$f" ]] && rm -f "$want"
     n=$((n + 1))
   done < <(find "$SRC" -type f -print0)
-  run chmod +x "$HOME"/.local/bin/{keyhud,keyhud-send,wsstrip,wsstrip-send,noctalia-keepalive} \
+  run chmod +x "$HOME"/.local/bin/{keyhud,keyhud-send,wsstrip,wsstrip-send,spotlight,spotlight-send,noctalia-keepalive} \
                "$HOME"/.config/hypr/scripts/*.sh
   run mkdir -p "$HOME/Pictures/Screenshots"
   ok "$n file disalin"

@@ -16,6 +16,9 @@ python-gobject
 python-cairo
 socat
 
+# --- spotlight: salin hasil kalkulator ---
+wl-clipboard
+
 # --- screenshot, media, layar ---
 grim
 slurp

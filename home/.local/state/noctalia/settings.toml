@@ -32,7 +32,7 @@ widget_spacing = 8
     border = ""
     fill = "#000000"
     id = "left"
-    members = [ "launcher", "workspaces" ]
+    members = [ "dracarys/spotlight:bar", "workspaces" ]
     opacity = 0.92000000000000004
     padding = 12.0
 
@@ -109,7 +109,7 @@ enabled = true
 
     [hot_corners.bottom_left]
     action = "command"
-    command = "noctalia msg panel-toggle launcher"
+    command = "sh -c '$HOME/.local/bin/spotlight-send toggle || noctalia msg panel-toggle launcher'"
 
     [hot_corners.bottom_right]
     action = "command"
@@ -398,7 +398,7 @@ temperature_day = 6500
 temperature_night = 3800
 
 [plugins]
-enabled = [ "dracarys/uptime" ]
+enabled = [ "dracarys/spotlight", "dracarys/uptime" ]
 
     [[plugins.source]]
     enabled = true
