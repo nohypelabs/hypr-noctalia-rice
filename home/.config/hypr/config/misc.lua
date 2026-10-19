@@ -1,6 +1,9 @@
 hl.config({
     dwindle = {
         preserve_split = true,
+        -- Area dibelah kiri-kanan hanya kalau lebarnya > 1.5x tingginya; selain itu atas-bawah.
+        -- Di monitor ultrawide, 2 window di separuh kanan jadi bertumpuk, bukan kolom sempit.
+        split_width_multiplier = 1.5,
     },
     ecosystem = {
         no_update_news = true,
