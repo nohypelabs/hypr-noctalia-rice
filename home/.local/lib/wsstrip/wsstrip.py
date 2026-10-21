@@ -703,6 +703,9 @@ class App(Gtk.Application):
         self.edge = EdgeTrigger(self, self.strip)
         if os.path.exists(PIN_FILE):
             self.strip.set_pinned(True)
+            # pin dipulihkan saat login berebut dengan bar noctalia; sesekali buffer area
+            # bawah kartu gak tergambar ulang (putih/sisa lama). Petakan ulang sekali setelah tenang.
+            self._remap_id = GLib.timeout_add(2500, self._remap_strip)
         try:
             os.unlink(SOCK)
         except FileNotFoundError:

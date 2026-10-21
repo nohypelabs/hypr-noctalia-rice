@@ -1,7 +1,7 @@
 -- Hyprland default apps
 
-TERMINAL     = "kitty"
-FILE_MANAGER = "kitty --class yazi -e yazi"
+TERMINAL     = "rio"
+FILE_MANAGER = "rio --app-id yazi -e yazi"
 BROWSER      = "brave"
 EDITOR       = "gnome-text-editor --new-window"
 CALCULATOR   = "gnome-calculator"

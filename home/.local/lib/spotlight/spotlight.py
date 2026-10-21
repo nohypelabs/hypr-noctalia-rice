@@ -31,6 +31,10 @@ gi.require_version("Gtk4LayerShell", "1.0")
 from gi.repository import Gdk, GdkPixbuf, Gio, GioUnix, GLib, Gtk  # noqa: E402
 from gi.repository import Gtk4LayerShell as LS  # noqa: E402
 
+# Preload gtk4-layer-shell sudah termuat; buang dari env biar gak diwarisi app yang
+# diluncurkan (app GTK3/Java seperti Nuvio hang kalau GTK4 ikut ke-preload).
+os.environ.pop("LD_PRELOAD", None)
+
 RUNTIME = os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
 SOCK = os.path.join(RUNTIME, "spotlight.sock")
 USAGE_FILE = os.path.expanduser("~/.local/state/spotlight/usage.json")

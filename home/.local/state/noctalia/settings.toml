@@ -1,4 +1,4 @@
-config_version = 14
+config_version = 15
 
 [accessibility]
 ui_scale = 1.0000000074505806
@@ -33,7 +33,7 @@ widget_spacing = 8
     fill = "#000000"
     id = "left"
     members = [ "dracarys/spotlight:bar", "workspaces", "dracarys/appname:bar" ]
-    opacity = 0.55
+    opacity = 0.55000000000000004
     padding = 12.0
 
     [[bar.default.capsule_group]]
@@ -44,7 +44,6 @@ widget_spacing = 8
     opacity = 1.0
     padding = 16.0
 
-    # Now Playing terpisah dari island: jam tetap persis di tengah layar saat ada media
     [[bar.default.capsule_group]]
     border = ""
     fill = "#000000"
@@ -60,7 +59,7 @@ widget_spacing = 8
     fill = "#000000"
     id = "stats"
     members = [ "temp", "sysmon_2", "sysmon_3", "dracarys/uptime:bar" ]
-    opacity = 0.55
+    opacity = 0.55000000000000004
     padding = 10.0
 
     [[bar.default.capsule_group]]
@@ -68,7 +67,7 @@ widget_spacing = 8
     fill = "#000000"
     id = "status"
     members = [ "tray", "network", "bluetooth", "volume", "battery", "control-center" ]
-    opacity = 0.55
+    opacity = 0.55000000000000004
     padding = 12.0
 
 [dock]
@@ -90,7 +89,19 @@ magnification = true
 magnification_scale = 1.6000000000000001
 main_axis_padding = 10
 margin_edge = 8
-pinned = [ "rice-launchpad", "brave-browser", "kitty", "org.telegram.desktop", "yazi", "dev.zed.Zed", "code-oss", "obsidian", "spotify" ]
+pinned = [
+    "rice-launchpad",
+    "brave-browser",
+    "kitty",
+    "org.telegram.desktop",
+    "yazi",
+    "dev.zed.Zed",
+    "code-oss",
+    "obsidian",
+    "spotify",
+    "com.obsproject.Studio",
+    "rio"
+]
 position = "bottom"
 radius = 22
 reserve_space = false
@@ -110,7 +121,7 @@ enabled = true
 
     [hot_corners.bottom_right]
     action = "command"
-    command = "noctalia msg session lock"
+    command = "@HOME@/.local/bin/lock"
 
     [hot_corners.top_right]
     action = "command"
@@ -394,6 +405,12 @@ enabled = true
 temperature_day = 6500
 temperature_night = 3800
 
+[osd]
+border = false
+offset_x = 14
+offset_y = 6
+position = "top_right"
+
 [plugins]
 enabled = [ "dracarys/appname", "dracarys/spotlight", "dracarys/uptime" ]
 
@@ -427,15 +444,15 @@ panel_anchor_bar = "default"
     [shell.panel]
     clipboard_placement = "floating"
     clipboard_position = "center"
-    wallpaper_placement = "floating"
-    wallpaper_position = "center"
     control_center_placement = "floating"
     control_center_position = "top_right"
-    open_near_click_control_center = false
     floating_offset = 8
     launcher_position = "top_center"
+    open_near_click_control_center = false
     polkit_position = "auto"
     transparency_mode = "glass"
+    wallpaper_placement = "floating"
+    wallpaper_position = "center"
 
     [shell.screenshot]
     copy_to_clipboard = true
@@ -509,9 +526,3 @@ color = "on_surface"
 
 [widget.workspaces]
 capsule = false
-
-[osd]
-border = false
-offset_x = 14
-offset_y = 6
-position = "top_right"

@@ -15,8 +15,10 @@ hl.config({
         },
         middle_click_paste = false,
         enable_swallow = true,
-        swallow_regex = "(kitty|ghostty|[Kk]onsole|Alacritty|gnome-terminal|xfce[0-9]?-terminal)",
+        swallow_regex = "(kitty|rio|Rio|ghostty|[Kk]onsole|Alacritty|gnome-terminal|xfce[0-9]?-terminal)",
         vrr = 3,
+        -- Kalau noctalia mati saat layar terkunci (mis. habis resume), noctalia baru boleh ambil alih kunci.
+        allow_session_lock_restore = true,
     },
     render = {
         direct_scanout = 2,

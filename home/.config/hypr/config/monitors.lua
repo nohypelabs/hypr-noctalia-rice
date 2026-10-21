@@ -48,14 +48,16 @@ local mode = read_mode()
 local ports = external_ports()
 local any_external = connected_signature(ports) ~= ""
 
+-- eDP-1 TIDAK PERNAH di-disable: kalau eksternal hilang sesaat saat resume, Hyprland
+-- tidak boleh sampai 0 output (itu yang membunuh client + Xwayland, 20-21 Okt).
+-- Di mode external-only dengan eksternal terpasang, eDP-1 diparkir jauh dari layout
+-- (kursor tidak sampai ke sana); lid close mematikan backlight-nya (scripts/lid.sh).
+local park = (mode == "external-only" and any_external)
 hl.monitor({
     output   = INTERNAL,
     mode     = "preferred",
-    position = "0x0",
+    position = park and "10000x10000" or "0x0",
     scale    = 1.0,
-    -- Tanpa layar eksternal, laptop jangan pernah dimatikan (layar hitam).
-    -- Rule port eksternal tetap ikut mode, supaya saat dicolok lagi langsung nyala.
-    disabled = (mode == "external-only" and any_external),
 })
 
 -- Monitor yang mode "preferred"-nya bukan refresh tertinggi. Rule desc: menang

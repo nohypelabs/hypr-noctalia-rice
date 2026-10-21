@@ -1,12 +1,15 @@
 #!/bin/sh
 # Jaga noctalia tetap hidup selama sesi Hyprland ini masih ada (dipanggil dari autostart.lua).
 # Sengaja bukan noctalia.service: service itu ikut nyala di Plasma.
+# Layar kunci sekarang hyprlock (proses terpisah), jadi noctalia mati tidak membuka kunci.
 sock="$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE"
+first=1
 while [ -n "$HYPRLAND_INSTANCE_SIGNATURE" ] && [ -d "$sock" ]; do
     if pgrep -xu "$(id -u)" noctalia >/dev/null; then
-        sleep 5
+        sleep 2
     else
-        noctalia
+        setsid -f noctalia
         sleep 2
     fi
+    first=
 done

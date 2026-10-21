@@ -62,7 +62,7 @@ hl.bind(mainMod .. " + J", noctalia("bar-toggle"))                              
 hl.bind(mainMod .. " + Y", hl.dsp.layout("togglesplit"))                        -- sway: $mod+y layout toggle split
 hl.bind(mainMod .. " + H", hl.dsp.layout("preselect r"))                        -- sway: $mod+h splith (dwindle: window berikutnya ke kanan)
 hl.bind(mainMod .. " + SHIFT + V", hl.dsp.layout("preselect d"))                -- sway: $mod+Shift+v splitv (window berikutnya ke bawah)
-hl.bind(mainMod .. " + L", noctalia("session lock"), { locked = true })                            -- sway: $mod+l swaylock
+hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("@HOME@/.local/bin/lock"), { locked = true })                            -- sway: $mod+l swaylock
 hl.bind(mainMod .. " + ALT + C", noctalia("panel-toggle session"))              -- sway: $mod+Mod1+c wlogout
 
 -- ### Drag / resize floating windows pakai mouse ############################
@@ -89,7 +89,7 @@ hl.bind(mainMod .. " + CTRL + SHIFT + Left", hl.dsp.window.move({ workspace = "e
 
 -- ### Apps #################################################################
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))                      -- sway: $mod+Return $term
-hl.bind(mainMod .. " + grave", hl.dsp.exec_cmd("kitten quick-access-terminal"))  -- terminal dropdown (config: kitty/quick-access-terminal.conf)
+hl.bind(mainMod .. " + grave", hl.dsp.exec_cmd("rio-dropdown"))  -- terminal dropdown (~/.local/bin/rio-dropdown)
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(FILE_MANAGER))
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("kate"))                             -- sway: $mod+t kate
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("kcalc"))                            -- sway: $mod+c kcalc
@@ -193,7 +193,7 @@ hl.bind("XF86MonBrightnessDown", noctalia("brightness-down", "brightnessctl set 
 hl.bind("XF86MonBrightnessUp", noctalia("brightness-up", "brightnessctl set 5%+"), { repeating = true, locked = true })
 
 -- ### Ekstra khusus Hyprland (kombo ini gak dipakai di sway) ################
-hl.bind("XF86PowerOff", noctalia("session lock"), { locked = true })
+hl.bind("XF86PowerOff", hl.dsp.exec_cmd("@HOME@/.local/bin/lock"), { locked = true })
 hl.bind(mainMod .. " + BackSpace", hl.dsp.workspace.toggle_special("magic"))    -- scratchpad alt
 hl.bind(mainMod .. " + slash", shell(keyhudSend .. " cheatsheet || " .. hyprScripts .. "/cheatsheet.sh")) -- daftar keybind (keyhud, fallback kitty)
 hl.bind(mainMod .. " + SHIFT + slash", shell(keyhudSend .. " toggle-osd"))       -- HUD keybind on/off
@@ -209,3 +209,8 @@ if keyhudFile then
   for i, v in ipairs(keyhudList) do keyhudFile:write(i .. "\t" .. v .. "\n") end
   keyhudFile:close()
 end
+
+-- Lid: backlight eDP-1 mati saat ditutup dengan eksternal terpasang (output tetap ada, lihat monitors.lua)
+local lidScript = os.getenv("HOME") .. "/.config/hypr/scripts/lid.sh"
+rawBind("switch:on:Lid Switch", hl.dsp.exec_cmd(lidScript .. " close"), { locked = true })
+rawBind("switch:off:Lid Switch", hl.dsp.exec_cmd(lidScript .. " open"), { locked = true })

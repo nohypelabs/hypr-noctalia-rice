@@ -144,7 +144,7 @@ show_labels = false
 [idle]
     [idle.behavior.lock]
     action = "lock"
-    enabled = true
+    enabled = false
     timeout = 300.0
 
     [idle.behavior.screen-off]
@@ -154,5 +154,5 @@ show_labels = false
 
     [idle.behavior.lock-and-suspend]
     action = "lock_and_suspend"
-    enabled = true
+    enabled = false
     timeout = 900.0

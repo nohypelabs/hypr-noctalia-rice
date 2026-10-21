@@ -67,8 +67,17 @@ hl.window_rule({
     },
 })
 
+-- Dropdown terminal (SUPER + grave): Rio di special workspace "dropdown"
+hl.window_rule({
+    match = { class = "^(rio-dropdown)$" },
+    float = true,
+    workspace = "special:dropdown",
+    size = { "monitor_w*0.80", "monitor_h*0.45" },
+    move = { "(monitor_w-window_w)/2", "40" },
+})
+
 -- Opacity Overrides
-local terminals = "^(kitty|ghostty|[Kk]onsole|Alacritty|gnome-terminal|xfce[0-9]?-terminal)$"
+local terminals = "^(kitty|rio|Rio|rio-dropdown|ghostty|[Kk]onsole|Alacritty|gnome-terminal|xfce[0-9]?-terminal)$"
 
 hl.window_rule({ match = { class = "^(firefox|zen)$" }, opacity = "1.0 override" })
 hl.window_rule({ match = { class = terminals }, opacity = "1.0 override" }) -- Override opacity in favor of terminal settings for opacity. If your terminal doesn't support transparency, you can remove this rule.
