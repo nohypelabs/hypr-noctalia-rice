@@ -27,5 +27,9 @@ hl.animation({ leaf = "fadeOut",             enabled = true, speed = 2,   bezier
 hl.animation({ leaf = "fadeSwitch",          enabled = true, speed = 3,   bezier = "appleOut"                       })
 hl.animation({ leaf = "border",              enabled = true, speed = 4,   bezier = "appleOut"                       })
 hl.animation({ leaf = "workspaces",          enabled = true, speed = 4,   spring = "appleSmooth", style = "slidevert" }) -- vertikal, searah strip workspace (wsstrip)
+-- Dipanggil wsstrip (hyprctl eval) saat klik kartu: pindah workspace instan di balik animasi zoom kartu.
+function rice_ws_anim(on)
+  hl.animation({ leaf = "workspaces", enabled = on, speed = 4, spring = "appleSmooth", style = "slidevert" })
+end
 hl.animation({ leaf = "specialWorkspaceIn",  enabled = true, speed = 3,   spring = "appleBouncy", style = "slidevert" })
 hl.animation({ leaf = "specialWorkspaceOut", enabled = true, speed = 2.5, bezier = "appleOut",    style = "slidevert" })

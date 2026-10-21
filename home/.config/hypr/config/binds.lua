@@ -159,23 +159,30 @@ hl.bind(mainMod .. " + SHIFT + minus", hl.dsp.window.move({ workspace = "special
 hl.bind(mainMod .. " + minus", hl.dsp.workspace.toggle_special("magic"))                    -- sway: scratchpad show
 
 -- ### Workspaces ###########################################################
+-- Pindah workspace lewat wsstrip (animasi zoom kartu); kalau daemon mati, jatuh ke dispatch biasa.
+local function ws_go(target)
+  local home = os.getenv("HOME")
+  local arg = type(target) == "number" and tostring(target) or target
+  local native = type(target) == "number" and tostring(target) or '"' .. target .. '"'
+  return hl.dsp.exec_cmd(home .. '/.local/bin/wsstrip-send "go ' .. arg .. '" || hyprctl eval \'hl.dispatch(hl.dsp.focus({ workspace = ' .. native .. ' }))\'')
+end
 -- sway: $mod+1..0 workspace, $mod+Shift+1..0 & $mod+Mod1+1..0 move container
 for i = 1, 10 do
   local key = tostring(i % 10)
-  hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }))
+  hl.bind(mainMod .. " + " .. key, ws_go(i))
   hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
   hl.bind(mainMod .. " + ALT + " .. key, hl.dsp.window.move({ workspace = i }))
 end
 
 -- ### Workspace navigation #################################################
 -- "e+1"/"e-1" = workspace yang beneran ada (padanan `workspace next/prev` sway)
-hl.bind(mainMod .. " + CTRL + Right", hl.dsp.focus({ workspace = "e+1" }))      -- sway: $mod+Control+Right
-hl.bind(mainMod .. " + CTRL + Left", hl.dsp.focus({ workspace = "e-1" }))       -- sway: $mod+Control+Left
+hl.bind(mainMod .. " + CTRL + Right", ws_go("e+1"))      -- sway: $mod+Control+Right
+hl.bind(mainMod .. " + CTRL + Left", ws_go("e-1"))       -- sway: $mod+Control+Left
 hl.bind(mainMod .. " + CTRL + Down", hl.dsp.focus({ workspace = "empty" }))     -- sway: empty-workspace.sh
 hl.bind(mainMod .. " + CTRL + ALT + Right", hl.dsp.window.move({ workspace = "e+1" })) -- sway: $mod+Control+Mod1+Right
 hl.bind(mainMod .. " + CTRL + ALT + Left", hl.dsp.window.move({ workspace = "e-1" }))  -- sway: $mod+Control+Mod1+Left
-hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))        -- sway: $mod+button4 workspace next
-hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }))          -- sway: $mod+button5 workspace prev
+hl.bind(mainMod .. " + mouse_down", ws_go("e+1"))        -- sway: $mod+button4 workspace next
+hl.bind(mainMod .. " + mouse_up", ws_go("e-1"))          -- sway: $mod+button5 workspace prev
 
 -- ### Media keys ###########################################################
 -- sway: pactl/brightnessctl + slider waybar. Di hypr: noctalia (udah ada OSD-nya),

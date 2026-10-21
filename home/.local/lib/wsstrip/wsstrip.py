@@ -23,8 +23,10 @@ gi.require_version("Gtk", "4.0")
 gi.require_version("Gdk", "4.0")
 gi.require_version("GioUnix", "2.0")
 gi.require_version("GdkPixbuf", "2.0")
+gi.require_version("Graphene", "1.0")
+gi.require_version("Gsk", "4.0")
 gi.require_version("Gtk4LayerShell", "1.0")
-from gi.repository import Gdk, GdkPixbuf, Gio, GioUnix, GLib, Gtk  # noqa: E402
+from gi.repository import Gdk, GdkPixbuf, Gio, GioUnix, GLib, Graphene, Gsk, Gtk  # noqa: E402
 from gi.repository import Gtk4LayerShell as LS  # noqa: E402
 
 WORKSPACES = [1, 2, 3, 4, 5]        # semua tampil saat di-pin
@@ -32,7 +34,12 @@ FLOAT_COUNT = 3                     # mode melayang (hover) cuma 3 pertama
 RUNTIME = os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
 SOCK = os.path.join(RUNTIME, "wsstrip.sock")
 THUMBS = os.path.join(RUNTIME, "wsstrip")
-CARD_W, CARD_H = 269, 151          # 16:9 (70% dari 384x216); grim diskalakan ke lebar ini
+CARD_W, CARD_H = 269, 151          # 16:9 (70% dari 384x216)
+THUMB_W = 640                      # grim diskalakan ke lebar ini (lebih tajam buat zoom klik kartu)
+ZOOM_MS = 580                      # kartu membesar jadi layar penuh
+ZOOM_SWITCH = 0.70                 # pindah workspace di balik gambar (fraksi ZOOM_MS)
+ZOOM_FADE_AT = 0.80                # mulai luntur (fraksi ZOOM_MS), sambil zoom berakhir
+ZOOM_FADE_MS = 280                 # lama luntur ke workspace asli
 EDGE_SKIP = 140                    # px sudut atas/bawah yang gak memicu strip
 DWELL_MS = 180                     # kursor harus diam di tepi segini dulu
 HIDE_MS = 500                      # kursor harus di luar area strip segini baru sembunyi
@@ -339,6 +346,7 @@ class Strip:
             self.box.append(c.overlay)
             self.cards.append(c)
         self.win.set_child(self.box)
+        self.zoom = ZoomOverlay(app, self)
 
         keys = Gtk.EventControllerKey()
         keys.connect("key-pressed", self._on_key)
@@ -513,7 +521,22 @@ class Strip:
         capture_async(go)
         GLib.timeout_add(200, go)
 
-    def go(self, ws):
+    def go(self, target):
+        """target: nomor workspace, atau "e+1"/"e-1" (workspace yang ada, tanpa keliling)."""
+        active = hypr("activeworkspace") or {}
+        cur = active.get("id")
+        if isinstance(target, str):
+            ids = sorted({w["id"] for w in hypr("workspaces") or []
+                          if w["id"] > 0 and w.get("monitor") == active.get("monitor")} | {cur})
+            i = ids.index(cur) + (1 if target == "e+1" else -1)
+            if not 0 <= i < len(ids):
+                return
+            target = ids[i]
+        ws = target
+        card = next((c for c in self.cards if c.ws == ws), None)
+        if ws != cur and ws in WORKSPACES and self.zoom.start(card, ws, active.get("monitor")):
+            self.hide()
+            return
         hypr_eval(f"hl.dispatch(hl.dsp.focus({{ workspace = {ws} }}))")
         self.hide()
 
@@ -559,6 +582,128 @@ class Strip:
         self.win.set_visible(False)
         LS.set_keyboard_mode(self.win, LS.KeyboardMode.NONE)
         return False
+
+
+class ZoomView(Gtk.Widget):
+    """Gambar thumbnail yang tumbuh dari rect kartu ke seluruh layar (sudut membulat)."""
+    __gtype_name__ = "WsstripZoomView"
+
+    def __init__(self):
+        super().__init__()
+        self.tex = None
+        self.rect = (0.0, 0.0, 1.0, 1.0)
+        self.radius = 0.0
+        self.scrim = 0.0     # peredam latar (workspace lama) selama kartu membesar
+
+    def do_snapshot(self, snap):
+        if not self.tex:
+            return
+        if self.scrim > 0:
+            snap.append_color(Gdk.RGBA(0, 0, 0, self.scrim),
+                              Graphene.Rect().init(0, 0, self.get_width(), self.get_height()))
+        x, y, w, h = self.rect
+        clip = Gsk.RoundedRect()
+        clip.init_from_rect(Graphene.Rect().init(x, y, w, h), self.radius)
+        snap.push_rounded_clip(clip)
+        # COVER: isi rect penuh, sisanya terpotong (sama dengan gambar di kartu)
+        k = max(w / self.tex.get_width(), h / self.tex.get_height())
+        tw, th = self.tex.get_width() * k, self.tex.get_height() * k
+        snap.append_texture(self.tex, Graphene.Rect().init(x + (w - tw) / 2, y + (h - th) / 2, tw, th))
+        snap.pop()
+
+
+class ZoomOverlay:
+    """Klik kartu workspace: gambar kartu membesar dari posisinya sampai menutup layar, di
+    bawahnya workspace berpindah tanpa animasi geser, lalu gambar luntur. Gaya Mission Control."""
+
+    def __init__(self, app, strip):
+        self.strip = strip
+        self.win = Gtk.Window(application=app)
+        self.win.add_css_class("wsstrip")
+        LS.init_for_window(self.win)
+        LS.set_namespace(self.win, "wsstrip-zoom")
+        LS.set_layer(self.win, LS.Layer.OVERLAY)
+        for e in (LS.Edge.LEFT, LS.Edge.RIGHT, LS.Edge.TOP, LS.Edge.BOTTOM):
+            LS.set_anchor(self.win, e, True)
+        LS.set_exclusive_zone(self.win, -1)
+        LS.set_keyboard_mode(self.win, LS.KeyboardMode.NONE)
+        self.view = ZoomView()
+        self.view.set_hexpand(True)
+        self.view.set_vexpand(True)
+        self.win.set_child(self.view)
+        self.win.connect("realize", lambda w: w.get_surface().set_input_region(cairo.Region()))
+        self.tick_id = 0
+        self.busy = False
+
+    def start(self, card, ws, mon_name):
+        """True kalau animasi jalan; False = pemanggil pindah workspace biasa."""
+        path = os.path.join(THUMBS, f"ws-{ws}-full.jpg")
+        if not os.path.exists(path):
+            path = os.path.join(THUMBS, f"ws-{ws}.jpg")
+        mon = next((m for m in hypr("monitors") or [] if m.get("name") == mon_name), None)
+        if self.busy or not mon or not os.path.exists(path):
+            return False
+        sc = mon.get("scale", 1) or 1
+        W, H = mon["width"] / sc, mon["height"] / sc
+        left = self.strip.win.get_width() if self.strip.pinned else 0   # strip ter-pin gak ditutup
+        full = (left, 0, W - left, H)
+        b = card.overlay.compute_bounds(self.strip.win) if card and self.strip.shown else None
+        if b and b[0]:
+            r = b[1]
+            win_h = self.strip.win.get_height()
+            # surface strip: kiri, tengah vertikal
+            box0 = (r.get_x(), r.get_y() + (H - win_h) / 2, r.get_width(), r.get_height())
+        else:   # tanpa kartu (pindah lewat keyboard): tumbuh dari tengah layar
+            bw, bh = full[2] * 0.6, full[3] * 0.6
+            box0 = (left + (full[2] - bw) / 2, (H - bh) / 2, bw, bh)
+        x0, y0 = box0[0], box0[1]
+        try:
+            self.view.tex = Gdk.Texture.new_from_filename(path)
+        except GLib.Error:
+            return False
+        gm = gdk_monitor(self.win.get_display(), mon_name)
+        if gm:
+            LS.set_monitor(self.win, gm)
+        self.busy = True
+        self.view.set_opacity(1)
+        self.view.rect = box0
+        self.view.radius = 9.0
+        self.view.scrim = 0.0
+        self.win.present()
+        self.view.queue_draw()
+        state = {"t0": None, "switched": False}
+
+        def tick(widget, clock):
+            now = clock.get_frame_time() / 1000.0
+            if state["t0"] is None:
+                state["t0"] = now
+            t = now - state["t0"]
+            p = min(1.0, t / ZOOM_MS)
+            e = 1 - (1 - p) ** 3            # easeOutCubic
+            self.view.rect = tuple(a + (b - a) * e for a, b in zip(box0, full))
+            self.view.radius = 9.0 * (1 - e)
+            self.view.scrim = 0.4 * e
+            # pindah saat gambar sudah hampir penuh; luntur mulai sebelum zoom selesai
+            # (satu timeline, tanpa jeda diam) supaya gambar buram menyatu ke yang asli
+            if not state["switched"] and p >= ZOOM_SWITCH:
+                state["switched"] = True
+                # animasi geser dimatikan sebentar: pindahnya harus instan di balik gambar
+                hypr_eval("rice_ws_anim(false) "
+                          f"hl.dispatch(hl.dsp.focus({{ workspace = {ws} }}))")
+                GLib.timeout_add(250, lambda: (hypr_eval("rice_ws_anim(true)"), False)[1])
+            f = (t - ZOOM_FADE_AT * ZOOM_MS) / ZOOM_FADE_MS
+            if f > 0:
+                f = min(1.0, f)
+                self.view.set_opacity(1 - f * f * (3 - 2 * f))   # smoothstep
+                if f >= 1.0:
+                    self.win.set_visible(False)
+                    self.busy = False
+                    return GLib.SOURCE_REMOVE
+            self.view.queue_draw()
+            return GLib.SOURCE_CONTINUE
+
+        self.tick_id = self.win.add_tick_callback(tick)
+        return True
 
 
 class EdgeTrigger:
@@ -639,7 +784,7 @@ def cursor_pos():
     return (d["x"], d["y"]) if d and "x" in d else None
 
 
-_capture = {"proc": None, "waiters": []}
+_capture = {"proc": None, "waiters": [], "pending": 0}
 
 
 def capture_async(done=None, skip_left=0):
@@ -652,10 +797,10 @@ def capture_async(done=None, skip_left=0):
     active = hypr("activeworkspace") or {}
     ws, mon = active.get("id"), active.get("monitor")
     if ws not in WORKSPACES or not mon:
-        return _capture_done(None, None, None)
+        return _capture_finish()
     m = next((m for m in hypr("monitors") or [] if m.get("name") == mon), None)
     if not m:
-        return _capture_done(None, None, None)
+        return _capture_finish()
     sc = m.get("scale", 1) or 1
     width, height = m["width"] / sc, m["height"] / sc
     # strip ter-pin: foto area desktop di sebelah kanannya saja (strip gak ikut kefoto)
@@ -665,24 +810,34 @@ def capture_async(done=None, skip_left=0):
         where = ["-g", f"{int(m['x'] + skip_left)},{int(m['y'])} {int(width)}x{int(height)}"]
     os.makedirs(THUMBS, exist_ok=True)
     dst = os.path.join(THUMBS, f"ws-{ws}.jpg")
+    full = os.path.join(THUMBS, f"ws-{ws}-full.jpg")   # resolusi asli, buat animasi zoom
+    flags = Gio.SubprocessFlags.STDOUT_SILENCE | Gio.SubprocessFlags.STDERR_SILENCE
     try:
-        proc = Gio.Subprocess.new(
-            ["grim", *where, "-s", f"{CARD_W / width:.4f}", "-t", "jpeg", "-q", "80",
-             dst + ".tmp"],
-            Gio.SubprocessFlags.STDOUT_SILENCE | Gio.SubprocessFlags.STDERR_SILENCE)
+        procs = [(Gio.Subprocess.new(["grim", *where, "-s", f"{THUMB_W / width:.4f}", "-t", "jpeg",
+                                      "-q", "80", dst + ".tmp"], flags), dst),
+                 (Gio.Subprocess.new(["grim", *where, "-t", "jpeg", "-q", "88", full + ".tmp"],
+                                     flags), full)]
     except GLib.Error:
-        return _capture_done(None, None, None)
-    _capture["proc"] = proc
-    proc.wait_check_async(None, _capture_done, dst)
+        return _capture_finish()
+    _capture["proc"] = procs[0][0]
+    _capture["pending"] = len(procs)
+    for proc, out in procs:
+        proc.wait_check_async(None, _capture_done, out)
 
 
 def _capture_done(proc, result, dst):
-    _capture["proc"] = None
     try:
         if proc and proc.wait_check_finish(result):
             os.replace(dst + ".tmp", dst)
     except (GLib.Error, OSError):
         pass
+    _capture["pending"] -= 1
+    if _capture["pending"] <= 0:
+        _capture_finish()
+
+
+def _capture_finish():
+    _capture["proc"] = None
     waiters, _capture["waiters"] = _capture["waiters"], []
     for cb in waiters:
         cb()
@@ -725,6 +880,9 @@ class App(Gtk.Application):
             self.strip.show()
         elif cmd == "hide":
             self.strip.hide()
+        elif cmd.startswith("go "):   # sama dengan klik kartu (animasi zoom), buat tes
+            arg = cmd[3:].strip()
+            self.strip.go(arg if arg in ("e+1", "e-1") else int(arg))
         elif cmd.startswith("pin"):
             arg = cmd[3:].strip()
             self.strip.set_pinned({"on": True, "off": False}.get(arg, not self.strip.pinned))
