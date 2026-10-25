@@ -534,9 +534,7 @@ class Strip:
             target = ids[i]
         ws = target
         card = next((c for c in self.cards if c.ws == ws), None)
-        if ws != cur and ws in WORKSPACES and self.zoom.start(card, ws, active.get("monitor")):
-            self.hide()
-            return
+        # animasi zoom kartu dimatikan (bikin pusing, 23 Okt): langsung pindah workspace
         hypr_eval(f"hl.dispatch(hl.dsp.focus({{ workspace = {ws} }}))")
         self.hide()
 

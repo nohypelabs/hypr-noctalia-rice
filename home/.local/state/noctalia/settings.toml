@@ -401,7 +401,7 @@ widget_order = [
         show_weather = false
 
 [nightlight]
-enabled = true
+enabled = false
 temperature_day = 6500
 temperature_night = 3800
 

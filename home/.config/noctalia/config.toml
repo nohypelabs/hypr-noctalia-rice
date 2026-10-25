@@ -149,10 +149,13 @@ show_labels = false
 
     [idle.behavior.screen-off]
     action = "screen_off"
-    enabled = true
+    enabled = false
     timeout = 360.0
 
     [idle.behavior.lock-and-suspend]
     action = "lock_and_suspend"
     enabled = false
     timeout = 900.0
+
+[lockscreen]
+lock_before_suspend = false

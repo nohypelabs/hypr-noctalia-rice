@@ -98,10 +98,14 @@ end
 -- reload supaya rule di atas dihitung ulang (mis. laptop nyala lagi saat HDMI
 -- dicabut di mode external-only). Disable/enable dari reload sendiri tidak
 -- mengubah sysfs, jadi tidak loop.
+-- Habis reload, kursor dipindah ke tengah monitor yang tampil: kursor yang tadinya
+-- di HDMI (2560 lebar) dijepit ke pojok kanan bawah eDP = hot corner lock noctalia,
+-- jadi hyprlock muncul lagi tiap habis buka kunci (24 Okt).
+local CENTER_CURSOR = [[sleep 0.5; hyprctl monitors -j | jq -r '[.[] | select(.x < 10000)][0] | "\(.x + (.width / .scale / 2 | floor)) \(.y + (.height / .scale / 2 | floor))"' | { read -r x y && hyprctl eval "hl.dispatch(hl.dsp.cursor.move({ x = $x, y = $y }))"; }]]
 local signature_at_load = connected_signature(ports)
 local function on_hotplug()
     if connected_signature(external_ports()) ~= signature_at_load then
-        hl.exec_cmd("hyprctl reload")
+        hl.exec_cmd("hyprctl reload; " .. CENTER_CURSOR)
     end
 end
 hl.on("monitor.added", on_hotplug)

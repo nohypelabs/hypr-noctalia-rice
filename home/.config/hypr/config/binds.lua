@@ -159,12 +159,9 @@ hl.bind(mainMod .. " + SHIFT + minus", hl.dsp.window.move({ workspace = "special
 hl.bind(mainMod .. " + minus", hl.dsp.workspace.toggle_special("magic"))                    -- sway: scratchpad show
 
 -- ### Workspaces ###########################################################
--- Pindah workspace lewat wsstrip (animasi zoom kartu); kalau daemon mati, jatuh ke dispatch biasa.
+-- Pindah workspace pakai dispatch biasa (animasi slide vertikal dari animations.lua, tanpa zoom kartu wsstrip).
 local function ws_go(target)
-  local home = os.getenv("HOME")
-  local arg = type(target) == "number" and tostring(target) or target
-  local native = type(target) == "number" and tostring(target) or '"' .. target .. '"'
-  return hl.dsp.exec_cmd(home .. '/.local/bin/wsstrip-send "go ' .. arg .. '" || hyprctl eval \'hl.dispatch(hl.dsp.focus({ workspace = ' .. native .. ' }))\'')
+  return hl.dsp.focus({ workspace = target })
 end
 -- sway: $mod+1..0 workspace, $mod+Shift+1..0 & $mod+Mod1+1..0 move container
 for i = 1, 10 do
