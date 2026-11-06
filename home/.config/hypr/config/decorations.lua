@@ -4,13 +4,13 @@ hl.config({
     general = {
         gaps_in = 5,
         gaps_out = 10,
-        border_size = 1,
+        border_size = 2,
         extend_border_grab_area = 10,
         resize_on_border = true,
         col = {
-            -- Garis tipis ala macOS: putih transparan, bukan gradasi hijau
-            active_border = "rgba(ffffff40)",
-            inactive_border = "rgba(ffffff14)",
+            -- Garis tosca (teal): terang untuk jendela aktif, redup untuk nonaktif
+            active_border = "rgba(2dd4bfe6)",
+            inactive_border = "rgba(2dd4bf40)",
         },
     },
     group = {
