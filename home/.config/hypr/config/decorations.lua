@@ -46,6 +46,8 @@ hl.config({
             color_inactive = "rgba(00000038)",
         },
         blur = {
+            -- dimatikan 6 Nov: blur bikin frame patah saat jendela muncul (58 FPS → 60 FPS stabil tanpa blur)
+            enabled = false,
             size = 8,
             passes = 3,
             noise = 0.02,
