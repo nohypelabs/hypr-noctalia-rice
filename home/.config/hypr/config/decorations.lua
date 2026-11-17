@@ -4,13 +4,13 @@ hl.config({
     general = {
         gaps_in = 5,
         gaps_out = 10,
-        border_size = 2,
+        border_size = 1,
         extend_border_grab_area = 10,
         resize_on_border = true,
         col = {
-            -- Garis tosca (teal): terang untuk jendela aktif, redup untuk nonaktif
-            active_border = "rgba(2dd4bfe6)",
-            inactive_border = "rgba(2dd4bf40)",
+            -- Garis putih tipis, sama dengan bingkai strip workspace (wsstrip: 1px rgba(255,255,255,0.12))
+            active_border = "rgba(ffffff1f)",
+            inactive_border = "rgba(ffffff1f)",
         },
     },
     group = {
@@ -31,9 +31,9 @@ hl.config({
     },
     decoration = {
         dim_special = 0.3,
-        -- Sudut siku (rounding 0); rounding_power cuma berlaku kalau rounding > 0
-        rounding = 0,
-        rounding_power = 3.0,
+        -- Sudut 14px lingkaran biasa (power 2), sama dengan bingkai strip workspace ter-pin (wsstrip .strip.pinned)
+        rounding = 14,
+        rounding_power = 2.0,
         active_opacity = 0.96,
         inactive_opacity = 0.90,
         fullscreen_opacity = 1,

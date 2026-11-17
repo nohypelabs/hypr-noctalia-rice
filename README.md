@@ -39,7 +39,7 @@ Kalau kepakai, kasih ⭐ ya. Issue dan PR juga dipersilakan.
 
 | Bagian | Keterangan |
 |---|---|
-| **Hyprland** (`~/.config/hypr`, config Lua) | Dekorasi squircle + blur, animasi pegas ala iOS, perpindahan workspace vertikal, swipe 4 jari atas/bawah, mode layar proyektor |
+| **Hyprland** (`~/.config/hypr`, config Lua) | Sudut membulat 14px + garis tepi putih tipis + blur (senada dengan strip workspace), animasi pegas ala iOS, perpindahan workspace vertikal, swipe 4 jari atas/bawah, mode layar proyektor |
 | **noctalia** (`~/.local/state/noctalia/settings.toml`) | Bar tipis 30px: kiri 🔍 + titik workspace + **nama aplikasi aktif** ala menu bar macOS, tengah "Dynamic Island" hitam berisi jam (selalu persis di tengah), pil Now Playing hitam muncul di kanan saat ada media, kanan ikon status ringkas; kapsul samping transparan-blur. OSD volume/brightness di kanan atas (ala macOS Tahoe), dock ngambang + magnifikasi, lock screen ala iOS, hot corner, Night Light. Plugin lokal: `spotlight`, `appname`, `uptime` |
 | **spotlight** | Launcher ala Spotlight macOS: awalnya cuma bar pencarian, hasil Top Hit / Aplikasi muncul saat mengetik, kalkulator inline (Enter = salin), cari di web. Aplikasi yang sering dibuka naik ke atas |
 | **Launchpad** (bagian dari daemon spotlight) | Grid ikon semua aplikasi layar penuh ala macOS: 7×5 per halaman, latar desktop diblur, pencarian, geser halaman pakai touchpad/scroll/←→. Dibuka lewat ikon di dock, Super+G, atau cubit 4 jari |
