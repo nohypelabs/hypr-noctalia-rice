@@ -36,7 +36,7 @@ KEYS = {
     "RETURN": "↩", "Return": "↩", "Escape": "esc", "SPACE": "space", "Left": "←",
     "Right": "→", "Up": "↑", "Down": "↓", "BackSpace": "⌫", "Tab": "⇥", "grave": "`",
     "slash": "/", "minus": "−", "Print": "PrtSc", "mouse_down": "scroll ↓",
-    "mouse_up": "scroll ↑",
+    "mouse_up": "scroll ↑", "mouse:272": "klik kiri", "mouse:273": "klik kanan",
 }
 DIRS = {"left": "kiri", "right": "kanan", "up": "atas", "down": "bawah",
         "l": "kiri", "r": "kanan", "u": "atas", "d": "bawah"}
@@ -52,7 +52,7 @@ RULES = [
     (r"togglesplit", "Ganti arah split"),
     (r"preselect r", "Window berikutnya di kanan"),
     (r"preselect d", "Window berikutnya di bawah"),
-    (r"session lock", "Kunci layar"),
+    (r"session lock|local/bin/lock", "Kunci layar"),
     (r"panel-(toggle|open) session", "Menu power"),
     (r'focus\(\{ direction = "(\w+)"', lambda m, n: "Fokus ke " + DIRS[m.group(1)]),
     (r"cycle_next", "Ganti window"),
@@ -64,18 +64,28 @@ RULES = [
     (r'focus\(\{ workspace = "e\+1"', "Workspace berikutnya"),
     (r'focus\(\{ workspace = "e-1"', "Workspace sebelumnya"),
     (r'focus\(\{ workspace = "empty"', "Workspace kosong"),
-    (r"focus\(\{ workspace = i", lambda m, n: f"Ke workspace {n}"),
+    (r"focus\(\{ workspace = i|ws_go\(i\)", lambda m, n: f"Ke workspace {n}"),
+    (r'ws_go\("e\+1"\)', "Workspace berikutnya"),
+    (r'ws_go\("e-1"\)', "Workspace sebelumnya"),
     (r"toggle_special", "Scratchpad"),
-    (r"quick-access-terminal", "Terminal dropdown"),
+    (r"quick-access-terminal|rio-dropdown", "Terminal dropdown"),
     (r"-e btop", "Monitor sistem (btop)"),
     (r"exec_cmd\(terminal\)", "Terminal"),
-    (r"FILE_MANAGER", "File manager"),
-    (r'"kate"', "Kate"),
+    (r"TUI_FILE_MANAGER", "File manager di terminal (yazi)"),
+    (r"FILE_MANAGER", "File manager (Nautilus)"),
+    (r'"kate"', "Editor teks (Kate)"),
     (r'"kcalc"', "Kalkulator"),
-    (r'"brave"', "Brave"),
+    (r'"brave"', "Browser (Brave)"),
+    (r"vta-desktop --mic", "Tara (VTA): munculkan + bicara"),
+    (r"spotlight-send launchpad", "Launchpad"),
+    (r"wsstrip-send toggle", "Strip workspace (ala Spaces)"),
+    (r"wsstrip-send anim", "Ganti animasi strip workspace"),
+    (r"wsstrip-send pin", "Pin / lepas strip workspace"),
+    (r"window\.drag", "Seret window"),
+    (r"window\.resize", "Ubah ukuran window"),
     (r"control-center network", "Wi-Fi"),
     (r"control-center bluetooth", "Bluetooth"),
-    (r"exec_cmd\(menu\)", "Launcher aplikasi"),
+    (r"exec_cmd\(menu\)", "Spotlight"),
     (r"panel-toggle clipboard", "Riwayat clipboard"),
     (r"screenshot-region", "Screenshot area"),
     (r"screenshot-fullscreen", "Screenshot layar penuh"),
@@ -99,7 +109,7 @@ SECTIONS = {
     "Reload / exit": "Sistem", "Wallpaper": "Tampilan", "Tema dark/light": "Tampilan",
     "Notifications": "Notifikasi", "Scratchpad": "Workspace", "Workspaces": "Workspace",
     "Workspace navigation": "Workspace", "Ekstra khusus Hyprland": "Lainnya",
-    "keyhud": "Lainnya",
+    "keyhud": "Lainnya", "Drag / resize": "Mouse",
 }
 
 CSS = """
@@ -209,7 +219,7 @@ def describe(text, keys):
         m = re.search(pat, text)
         if m:
             return label(m, n) if callable(label) else label
-    c = re.search(r"--\s*(?:sway:\s*)?(.+)$", text)
+    c = re.search(r"\s--\s*(?:sway:\s*)?(.+)$", text)
     return c.group(1).strip() if c else keys
 
 
@@ -254,7 +264,7 @@ class Registry:
         groups, order = {}, []
         for idx in sorted(self.entries):
             e = self.entries[idx]
-            if "mouse" in e["keys"] or e["keys"].startswith("XF86"):
+            if e["keys"].startswith("XF86"):
                 continue
             head, _, last = e["keys"].rpartition("+")
             gid = (e["line"], head.strip()) if e["line"] else ("k", e["keys"])

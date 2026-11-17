@@ -1,7 +1,8 @@
 -- Hyprland default apps
 
 TERMINAL     = "rio"
-FILE_MANAGER = "rio --app-id yazi -e yazi"
+FILE_MANAGER = "nautilus --new-window"
+TUI_FILE_MANAGER = "rio --app-id yazi -e yazi"
 BROWSER      = "brave"
 EDITOR       = "gnome-text-editor --new-window"
 CALCULATOR   = "gnome-calculator"

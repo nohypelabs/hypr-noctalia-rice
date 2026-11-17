@@ -91,6 +91,7 @@ hl.bind(mainMod .. " + CTRL + SHIFT + Left", hl.dsp.window.move({ workspace = "e
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))                      -- sway: $mod+Return $term
 hl.bind(mainMod .. " + grave", hl.dsp.exec_cmd("rio-dropdown"))  -- terminal dropdown (~/.local/bin/rio-dropdown)
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(FILE_MANAGER))
+hl.bind(mainMod .. " + ALT + E", hl.dsp.exec_cmd(TUI_FILE_MANAGER))            -- yazi di terminal
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("kate"))                             -- sway: $mod+t kate
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("kcalc"))                            -- sway: $mod+c kcalc
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("brave"))                            -- sway: $mod+b brave
@@ -202,6 +203,7 @@ hl.bind(mainMod .. " + BackSpace", hl.dsp.workspace.toggle_special("magic"))    
 hl.bind(mainMod .. " + slash", shell(keyhudSend .. " cheatsheet || " .. hyprScripts .. "/cheatsheet.sh")) -- daftar keybind (keyhud, fallback kitty)
 hl.bind(mainMod .. " + SHIFT + slash", shell(keyhudSend .. " toggle-osd"))       -- HUD keybind on/off
 hl.bind(mainMod .. " + G", shell(os.getenv("HOME") .. "/.local/bin/spotlight-send launchpad")) -- Launchpad: grid semua aplikasi
+hl.bind(mainMod .. " + M", shell("vta-desktop --mic"))                         -- Tara (VTA desktop): munculkan + tombol bicara
 hl.bind(mainMod .. " + Tab", shell(os.getenv("HOME") .. "/.local/bin/wsstrip-send toggle")) -- strip workspace kiri ala Spaces (wsstrip)
 hl.bind(mainMod .. " + SHIFT + Tab", shell(os.getenv("HOME") .. "/.local/bin/wsstrip-send anim")) -- ganti gaya animasi strip workspace
 hl.bind(mainMod .. " + CTRL + Tab", shell(os.getenv("HOME") .. "/.local/bin/wsstrip-send pin")) -- pin/lepas strip workspace (makan ruang desktop)
