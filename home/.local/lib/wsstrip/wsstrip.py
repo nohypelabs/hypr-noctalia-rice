@@ -53,7 +53,7 @@ CSS = """
 window.wsstrip { background: transparent; font-family: "Inter", sans-serif; }
 .hit, window.stripwin { background: rgba(0, 0, 0, 0.01); }
 .strip {
-  background: rgba(22, 22, 26, 0.50);
+  background: rgba(0, 0, 0, 0.50);   /* sama dengan rio (hitam, opacity 0.5) biar blurnya senada */
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 18px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);

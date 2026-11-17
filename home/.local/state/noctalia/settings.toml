@@ -7,6 +7,7 @@ ui_scale = 1.0000000074505806
 background_opacity = 0.0
 border_width = 0.0
 capsule = false
+capsule_border_width = 1.0
 capsule_padding = 10.0
 capsule_radius = 15
 capsule_thickness = 0.85999999999999999
@@ -29,45 +30,45 @@ thickness = 30
 widget_spacing = 8
 
     [[bar.default.capsule_group]]
-    border = ""
+    border = "#ffffff1f"
     fill = "#000000"
     id = "left"
     members = [ "dracarys/spotlight:bar", "workspaces", "dracarys/appname:bar" ]
-    opacity = 0.55000000000000004
+    opacity = 0.5
     padding = 12.0
 
     [[bar.default.capsule_group]]
-    border = ""
+    border = "#ffffff1f"
     fill = "#000000"
     id = "island"
     members = [ "island_clock" ]
-    opacity = 1.0
+    opacity = 0.5
     padding = 16.0
 
     [[bar.default.capsule_group]]
-    border = ""
+    border = "#ffffff1f"
     fill = "#000000"
     id = "nowplaying"
     members = [ "media", "island_viz" ]
-    opacity = 1.0
+    opacity = 0.5
     padding = 14.0
 
     [[bar.default.capsule_group]]
     accordion = true
     accordion_direction = "start"
-    border = ""
+    border = "#ffffff1f"
     fill = "#000000"
     id = "stats"
     members = [ "temp", "sysmon_2", "sysmon_3", "dracarys/uptime:bar" ]
-    opacity = 0.55000000000000004
+    opacity = 0.5
     padding = 10.0
 
     [[bar.default.capsule_group]]
-    border = ""
+    border = "#ffffff1f"
     fill = "#000000"
     id = "status"
     members = [ "tray", "network", "bluetooth", "volume", "battery", "control-center" ]
-    opacity = 0.55000000000000004
+    opacity = 0.5
     padding = 12.0
 
 [dock]

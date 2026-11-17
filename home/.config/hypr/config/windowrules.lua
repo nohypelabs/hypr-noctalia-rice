@@ -131,7 +131,7 @@ hl.layer_rule({
     namespace = "^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd|window-switcher)$",
   },
   no_anim = true,
-  ignore_alpha = 0.5,
+  ignore_alpha = 0.4,  -- kapsul bar opacity 0.5 harus di atas ambang biar ikut blur
   blur = true,
   blur_popups = true,
 })
@@ -141,6 +141,14 @@ hl.layer_rule({
   name = "wsstrip",
   match = { namespace = "^wsstrip(-edge)?$" },
   no_anim = true,
+})
+
+-- Bingkai strip (alpha 0.5) diblur kayak jendela; bayangan (<= 0.35) & area tangkap 1% gak ikut
+hl.layer_rule({
+  name = "wsstrip-blur",
+  match = { namespace = "^wsstrip$" },
+  blur = true,
+  ignore_alpha = 0.4,
 })
 
 -- spotlight (~/.local/lib/spotlight) animasi muncul sendiri lewat CSS
