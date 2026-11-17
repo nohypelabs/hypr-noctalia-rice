@@ -18,7 +18,7 @@ Commit memakai identitas noreply GitHub (sudah diset di `git config` lokal repo 
 
 | Komponen | Lokasi | Inti |
 |---|---|---|
-| **wsstrip** | `.local/lib/wsstrip/wsstrip.py`, `bin/wsstrip`, `bin/wsstrip-send` | Strip workspace kiri (kartu 3D). Hover tepi kiri / Super+Tab; pin = Super+Ctrl+Tab (exclusive zone, 5 ws, ws kosong disembunyikan). 5 gaya animasi (default `kipas`). Juga menulis nama app aktif ke `$XDG_RUNTIME_DIR/rice-active-app` dan memetakan ulang strip saat bar noctalia dibuat ulang. |
+| **wsstrip** | `.local/lib/wsstrip/wsstrip.py`, `bin/wsstrip`, `bin/wsstrip-send` | Strip workspace kiri (kartu 3D). Hover tepi kiri / Super+Tab; pin = Super+Ctrl+Tab (exclusive zone, 8 ws, ws kosong disembunyikan). 5 gaya animasi (default `kipas`). Juga menulis nama app aktif ke `$XDG_RUNTIME_DIR/rice-active-app` dan memetakan ulang strip saat bar noctalia dibuat ulang. |
 | **spotlight** | `.local/lib/spotlight/spotlight.py`, `bin/spotlight`, `bin/spotlight-send` | Launcher Spotlight (Super+Space) + **Launchpad** (Super+G, cubit 4 jari, ikon dock `rice-launchpad`). Perintah: `toggle show hide query <t> launchpad launchpad-hide launchpad-page <n>`. |
 | **keyhud** | `.local/lib/keyhud/keyhud.py` | HUD keybind + cheatsheet Super+/. Label diturunkan dari isi baris `binds.lua`. |
 | Plugin noctalia | `.local/share/noctalia-plugins/{spotlight,appname,uptime}` | Luau. API yang terbukti ada: `noctalia.getenv/readFile/writeFile/fileExists/expandPath/runAsync/setUpdateInterval`, `barWidget.setText/setGlyph/setTooltip/setVisible`, `function update()`, `function onClick()`. Cek: `noctalia plugins lint <dir>`. |

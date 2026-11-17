@@ -43,7 +43,7 @@ Kalau kepakai, kasih ⭐ ya. Issue dan PR juga dipersilakan.
 | **noctalia** (`~/.local/state/noctalia/settings.toml`) | Bar tipis 30px: kiri 🔍 + titik workspace + **nama aplikasi aktif** ala menu bar macOS, tengah "Dynamic Island" hitam berisi jam (selalu persis di tengah), pil Now Playing hitam muncul di kanan saat ada media, kanan ikon status ringkas; kapsul samping transparan-blur. OSD volume/brightness di kanan atas (ala macOS Tahoe), dock ngambang + magnifikasi, lock screen ala iOS, hot corner, Night Light. Plugin lokal: `spotlight`, `appname`, `uptime` |
 | **spotlight** | Launcher ala Spotlight macOS: awalnya cuma bar pencarian, hasil Top Hit / Aplikasi muncul saat mengetik, kalkulator inline (Enter = salin), cari di web. Aplikasi yang sering dibuka naik ke atas |
 | **Launchpad** (bagian dari daemon spotlight) | Grid ikon semua aplikasi layar penuh ala macOS: 7×5 per halaman, latar desktop diblur, pencarian, geser halaman pakai touchpad/scroll/←→. Dibuka lewat ikon di dock, Super+G, atau cubit 4 jari |
-| **wsstrip** | (juga menulis nama aplikasi aktif buat plugin bar `appname`) Strip workspace di kiri (kartu 3D gaya Stage Manager). Muncul saat kursor di tepi kiri, bisa di-pin jadi kolom tetap (5 workspace, yang kosong disembunyikan). Pindah workspace (klik kartu, Super+angka, Super+Ctrl+←/→) memakai animasi zoom: gambar workspace tujuan membesar dari kartunya, lalu luntur ke yang asli (gesture touchpad tetap geser vertikal) |
+| **wsstrip** | (juga menulis nama aplikasi aktif buat plugin bar `appname`) Strip workspace di kiri (kartu 3D gaya Stage Manager). Muncul saat kursor di tepi kiri, bisa di-pin jadi kolom tetap (8 workspace, yang kosong disembunyikan). Pindah workspace (klik kartu, Super+angka, Super+Ctrl+←/→) memakai animasi zoom: gambar workspace tujuan membesar dari kartunya, lalu luntur ke yang asli (gesture touchpad tetap geser vertikal) |
 | **keyhud** | HUD kecil tiap kali keybind ditekan + cheatsheet (Super+/) |
 | **noctalia-keepalive** | Menyalakan ulang noctalia kalau mati (mis. setelah suspend) |
 | **kitty** | Tema Tokyo Night, terminal dropdown (Super+\`), kitten scroll/search |
@@ -222,7 +222,7 @@ Daftar lengkap: **Super+/**.
 | Super+Q / Super+Esc | Tutup window |
 | Super+F | Layar penuh |
 | Super+1…0 | Ke workspace 1–10 (Super+Shift+angka = kirim window) |
-| tepi kiri layar / Super+Tab | Strip workspace (keyboard: 1–5, ↑↓, Enter, Esc) |
+| tepi kiri layar / Super+Tab | Strip workspace (keyboard: 1–8, ↑↓, Enter, Esc) |
 | Super+Ctrl+Tab | Pin / lepas strip workspace |
 | Super+Shift+Tab | Ganti gaya animasi strip (pintu, geser, flip, zoom, kipas) |
 | Super+V | Riwayat clipboard |

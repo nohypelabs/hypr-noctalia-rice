@@ -29,7 +29,7 @@ gi.require_version("Gtk4LayerShell", "1.0")
 from gi.repository import Gdk, GdkPixbuf, Gio, GioUnix, GLib, Graphene, Gsk, Gtk  # noqa: E402
 from gi.repository import Gtk4LayerShell as LS  # noqa: E402
 
-WORKSPACES = [1, 2, 3, 4, 5]        # semua tampil saat di-pin
+WORKSPACES = [1, 2, 3, 4, 5, 6, 7, 8]  # semua tampil saat di-pin
 FLOAT_COUNT = 3                     # mode melayang (hover) cuma 3 pertama
 RUNTIME = os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
 SOCK = os.path.join(RUNTIME, "wsstrip.sock")
@@ -46,7 +46,7 @@ HIDE_MS = 500                      # kursor harus di luar area strip segini baru
 AREA_PAD = 60                      # area strip = lebar kartu + segini ke kanan
 POLL_MS = 100
 SETTLE_MS = 650                    # tunggu animasi slide workspace selesai baru grim
-PIN_CARD_W, PIN_CARD_H = 200, 113  # kartu saat di-pin (~75%), biar strip gak makan banyak ruang
+PIN_CARD_W, PIN_CARD_H = 150, 84   # kartu saat di-pin (~56%), biar 8 kartu muat di layar 1080p
 PIN_FILE = os.path.expanduser("~/.local/state/wsstrip/pinned")
 
 CSS = """
