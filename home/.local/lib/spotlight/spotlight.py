@@ -195,11 +195,42 @@ def calc(q):
 # Indeks aplikasi + skor pencarian
 # ---------------------------------------------------------------------------
 class Apps:
+    # Daftar dibaca langsung dari file .desktop, bukan Gio.AppInfo.get_all(): watch inotify
+    # GIO di /usr/share/applications bisa hilang diam-diam di daemon yang jalan lama, lalu
+    # AppInfoMonitor gak pernah bunyi dan cache GIO basi (app baru dipasang gak muncul).
+    # Gantinya tiap refresh cek mtime folder + file .desktop (~1 ms), muat ulang kalau beda.
+    DIRS = [os.path.join(d, "applications")
+            for d in [GLib.get_user_data_dir(), *GLib.get_system_data_dirs()]]
+
     def __init__(self):
         self.items = []
         self.usage = self._load_usage()
-        self.dirty = True
-        Gio.AppInfoMonitor.get().connect("changed", lambda *_: setattr(self, "dirty", True))
+        self.sig = None
+
+    def _scan(self):
+        """[(desktop_id, path)] sesuai spek XDG: folder prioritas tinggi menang per id,
+        subfolder jadi awalan id (kde/foo.desktop -> kde-foo.desktop)."""
+        seen, files, sig = set(), [], []
+        for base in self.DIRS:
+            for root, dirs, names in os.walk(base):
+                dirs.sort()
+                try:
+                    sig.append((root, os.stat(root).st_mtime_ns))
+                except OSError:
+                    continue
+                for n in sorted(names):
+                    if not n.endswith(".desktop"):
+                        continue
+                    path = os.path.join(root, n)
+                    try:
+                        sig.append((path, os.stat(path).st_mtime_ns))
+                    except OSError:
+                        continue
+                    did = os.path.relpath(path, base).replace(os.sep, "-")
+                    if did not in seen:   # entri Hidden di folder atas tetap menutupi yang bawah
+                        seen.add(did)
+                        files.append((did, path))
+        return files, sig
 
     @staticmethod
     def _load_usage():
@@ -219,18 +250,23 @@ class Apps:
             pass
 
     def refresh(self):
-        if not self.dirty:
+        files, sig = self._scan()
+        if sig == self.sig:
             return
-        self.dirty = False
+        self.sig = sig
         items = []
-        for a in Gio.AppInfo.get_all():
-            if not a.should_show() or not isinstance(a, GioUnix.DesktopAppInfo):
+        for did, path in files:
+            if did in SELF_IDS:   # entri dock Launchpad sendiri jangan ikut di grid
                 continue
-            if a.get_id() in SELF_IDS:   # entri dock Launchpad sendiri jangan ikut di grid
+            try:
+                a = GioUnix.DesktopAppInfo.new_from_filename(path)
+            except (GLib.Error, TypeError):   # Hidden=true / file rusak -> konstruktor NULL
+                a = None
+            if a is None or a.get_is_hidden() or not a.should_show():
                 continue
             kw = " ".join(a.get_keywords() or [])
             items.append({
-                "id": a.get_id(), "info": a, "name": a.get_display_name() or a.get_name(),
+                "id": did, "info": a, "name": a.get_display_name() or a.get_name(),
                 "generic": a.get_generic_name() or "", "kw": kw.lower(),
                 "exec": os.path.basename((a.get_executable() or "").lower()),
             })
@@ -281,6 +317,11 @@ def launch_app(apps, it):
     # sesi uwsm: jalankan sebagai unit systemd terpisah (gak ikut mati bareng daemon ini)
     if any(k.startswith("UWSM_") for k in os.environ) and GLib.find_program_in_path("uwsm"):
         subprocess.Popen(["uwsm", "app", "--", it["id"]], stdout=subprocess.DEVNULL,
+                         stderr=subprocess.DEVNULL, start_new_session=True)
+    elif GLib.find_program_in_path("gio") and it["info"].get_filename():
+        # lewat `gio launch` yang langsung keluar: app bukan anak daemon ini, jadi gak jadi zombie
+        # waktu ditutup (DesktopAppInfo.launch() langsung gak pernah di-waitpid)
+        subprocess.Popen(["gio", "launch", it["info"].get_filename()], stdout=subprocess.DEVNULL,
                          stderr=subprocess.DEVNULL, start_new_session=True)
     else:
         it["info"].launch([], None)
