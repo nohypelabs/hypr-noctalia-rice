@@ -1,4 +1,4 @@
-config_version = 15
+config_version = 16
 
 [accessibility]
 ui_scale = 1.0000000074505806
@@ -342,6 +342,7 @@ widget_order = [
         show_keyboard_layout = false
         show_login_button = false
         show_media = false
+        show_password_reveal = true
         show_session_buttons = false
         show_unlock_hint = false
         show_weather = false
@@ -369,6 +370,7 @@ widget_order = [
         show_keyboard_layout = false
         show_login_button = false
         show_media = false
+        show_password_reveal = true
         show_session_buttons = false
         show_unlock_hint = false
         show_weather = false
@@ -396,6 +398,7 @@ widget_order = [
         show_keyboard_layout = false
         show_login_button = false
         show_media = false
+        show_password_reveal = true
         show_session_buttons = false
         show_unlock_hint = false
         show_weather = false

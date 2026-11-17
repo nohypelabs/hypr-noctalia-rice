@@ -31,8 +31,8 @@ hl.config({
     },
     decoration = {
         dim_special = 0.3,
-        -- Sudut "squircle" (continuous corner) ala Apple
-        rounding = 14,
+        -- Sudut siku (rounding 0); rounding_power cuma berlaku kalau rounding > 0
+        rounding = 0,
         rounding_power = 3.0,
         active_opacity = 0.96,
         inactive_opacity = 0.90,
